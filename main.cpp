@@ -7,14 +7,14 @@ void draw_crossing(WINDOW* win, int lanes, int slots)
     //drawing horizontal lines
     for(int i = 0; i < lanes; ++i ){
         for(int j = 1; j <= side_length; ++j){
-            mvwprintw(win, side_length/2+i, j, ".");
+            mvwprintw(win, slots+i+1, j, ".");
         }
     }
 
     //drawing vertical lines
     for(int i = 0; i < lanes; ++i ){
         for(int j = 1; j <= side_length; ++j){
-            mvwprintw(win, j, side_length/2+i, ".");
+            mvwprintw(win, j, slots+i+1, ".");
         }
     }
 }
