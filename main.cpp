@@ -1,31 +1,42 @@
 #include <iostream>
 #include <ncurses.h>
-#include <string.h>
 
-void draw_crossing(int lanes, int slots)
+void draw_crossing(WINDOW* win, int lanes, int slots)
 {
-    int dimensions = 0;
-    dimensions = getmaxy(stdscr);
-    
-    //horizontal lines
-    for(int i = 0; i<lanes; ++i){
-        for(int j = 0; j<2*slots+lanes; j++){
-            mvaddch(dimensions/2+i, j +dimensions/2,'.');
-        };
-    }
-    //vertical lines
-    for(int i = 0; i<lanes; ++i){
-        for(int j = 0; j<2*slots+lanes; j++){
-            mvaddch(j+dimensions/2-slots, i+slots +dimensions/2, '.');
-        };
+    int side_length = 2*slots + lanes;
+    //drawing horizontal lines
+    for(int i = 0; i < lanes; ++i ){
+        for(int j = 1; j <= side_length; ++j){
+            mvwprintw(win, side_length/2+i, j, ".");
+        }
     }
 
+    //drawing vertical lines
+    for(int i = 0; i < lanes; ++i ){
+        for(int j = 1; j <= side_length; ++j){
+            mvwprintw(win, j, side_length/2+i, ".");
+        }
+    }
 }
 
-int main()
+int main(int argc, char* argv[])
 {
+    int lanes, slots;
+    lanes = atoi(argv[1]);
+    slots = atoi(argv[2]);
+    int height, width, start_y, start_x;
+    height = width = 2*slots + lanes;
+    start_y = start_x = 1;
+
     initscr();//initializes the screen and sets up memory and clears the screen
-    draw_crossing(4,10);
+
+    WINDOW* win = newwin(height+2, width+2, start_y, start_x);
+    refresh();
+    box(win, 0, 0);
+  //  wprintw(win, "Traffic Lights");
+    wrefresh(win);
+    draw_crossing(win, lanes,slots);
+    wrefresh(win);
     getch();
 
     endwin();//deallocates memory and ends ncurses
