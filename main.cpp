@@ -1,8 +1,12 @@
-#include<iostream>
+#include <iostream>
+#include <ncurses.h>
 
 int main()
 {
-    std::cout << "Hello" << std::endl;
+    initscr();
+    printw("Hello!");
+    getch();
+    endwin();
 
     return 0;
 }
