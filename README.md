@@ -1,9 +1,11 @@
 # TrafficLights
 
-Install necessary packages
+#### Application written to practice some of classic thread based problems
+
+Install necessary packages (Ubuntu 19.10)
 
 ```bash
-sudo apt install ncurses
+sudo apt-get install libncurses5-dev libncursesw5-dev
 sudo apt install cmake
 ```
 
