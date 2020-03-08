@@ -1,5 +1,7 @@
 #include <iostream>
 #include <ncurses.h>
+#include <thread>
+
 
 void draw_crossing(WINDOW* win, int lanes, int slots)
 {
@@ -10,7 +12,6 @@ void draw_crossing(WINDOW* win, int lanes, int slots)
             mvwprintw(win, slots+i+1, j, ".");
         }
     }
-
     //drawing vertical lines
     for(int i = 0; i < lanes; ++i ){
         for(int j = 1; j <= side_length; ++j){
@@ -19,27 +20,38 @@ void draw_crossing(WINDOW* win, int lanes, int slots)
     }
 }
 
-int main(int argc, char* argv[])
+void draw_map(int lanes, int slots)
 {
-    int lanes, slots;
-    lanes = atoi(argv[1]);
-    slots = atoi(argv[2]);
-    int height, width, start_y, start_x;
-    height = width = 2*slots + lanes;
+    int wall, start_y, start_x;
+    wall = 2*slots + lanes;
     start_y = start_x = 1;
 
     initscr();//initializes the screen and sets up memory and clears the screen
 
-    WINDOW* win = newwin(height+2, width+2, start_y, start_x);
-    refresh();
+    WINDOW* win = newwin(wall+2, wall+2, start_y, start_x);
     box(win, 0, 0);
-  //  wprintw(win, "Traffic Lights");
-    wrefresh(win);
     draw_crossing(win, lanes,slots);
-    wrefresh(win);
-    getch();
+    curs_set(0);
+
+    while(true) 
+    {
+        wrefresh(win);
+        if(std::cin.get() == 27)
+            break;
+    }
 
     endwin();//deallocates memory and ends ncurses
+}
+
+int main(int argc, char* argv[])
+{
+    if(argc != 3){
+        std::cout << "Niepoprawna liczba argumentow!\nNalezy podac dwa argumenty"<<std::endl;
+        return 0;
+    }
+
+    std::thread map(draw_map, atoi(argv[1]), atoi(argv[2]));
+    map.join();
 
     return 0;
 }
