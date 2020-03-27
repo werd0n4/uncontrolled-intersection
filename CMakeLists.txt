@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.16)
 project(TrafficLights)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 
-add_executable(TrafficLights main.cpp)
+add_executable(TrafficLights main.cpp Emergency.cpp Vehicle.cpp)
 
 target_link_libraries(TrafficLights -lncurses -lpthread)
