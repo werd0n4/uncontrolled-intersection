@@ -5,20 +5,24 @@
 class Emergency : protected Vehicle
 {
     private:
-        int i = 1;
+        int delta_y_to_do = 0;
+        int delta_x_to_do = 0;
+        int current_delta_y = 0;
+        int current_delta_x = 0;
 
     public:
-    Emergency(WINDOW* win, RoadState road_state, int start)
+    Emergency(WINDOW* win, RoadState road_state, Road_Pos start)
     {
         this->road_state = road_state;
-        set_on_junction(start); 
         this->win = win;
         this->symbol = (char*)"E";
+        this->start_pos = start;
+        this->set_on_junction(start_pos); 
     }
 
-    void set_on_junction(int start)
+    void set_on_junction(int start_pos)
     {
-        switch(start){
+        switch(start_pos){
             case 0://top
                 position.first = 1;
                 position.second = road_state.slots+1;
@@ -36,18 +40,99 @@ class Emergency : protected Vehicle
                 position.second = 2*road_state.slots + road_state.lanes;
                 break;
         }
-        mvwprintw(win, position.first, position.second, "E");
+        mvwprintw(win, position.first, position.second, symbol);
+        wrefresh(win);
     }
 
-    void move()
+    void calculate_movement_to_do(Movement_direction dir){
+        switch(dir){
+            case FORWARD:
+                delta_y_to_do = 2*road_state.slots + road_state.lanes-1;
+                delta_x_to_do = 0;
+                break;
+            case TURN_RIGHT:
+                delta_y_to_do = road_state.slots;
+                delta_x_to_do = road_state.slots;
+                break;
+            case TURN_LEFT:
+                delta_y_to_do = road_state.slots + road_state.lanes-1;
+                delta_x_to_do = road_state.slots + road_state.lanes-1;
+                break;
+        }
+    }
+
+    void step_y(Road_Pos start_pos){
+
+        switch (start_pos)
+        {
+        case RIGHT:
+            position.second--;
+            break;
+        case LEFT:
+            position.second++;
+            break;
+        case TOP:
+            position.first++;
+            break;
+        case BOT:
+            position.first--;
+        }
+    }
+
+    void step_x_right(Road_Pos start_pos){
+        switch (start_pos)
+        {
+        case RIGHT:
+            position.second--;
+            break;
+        case LEFT:
+            position.first++;
+            break;
+        case TOP:
+            position.second--;
+            break;
+        case BOT:
+            position.second++;
+            break;
+        }
+    }
+
+    void step_x_left(Road_Pos start_pos){
+        switch (start_pos)
+        {
+        case RIGHT:
+            position.first++;
+            break;
+        case LEFT:
+            position.first--;
+            break;
+        case TOP:
+            position.second++;
+            break;
+        case BOT:
+            position.second--;
+            break;
+        }
+    }
+
+    void move(Movement_direction dir)
     {
+
         mvwprintw(win, position.first, position.second, ".");
-        if(position.first >road_state.lanes + road_state.slots){
-            --position.first;
+
+        if(current_delta_y < delta_y_to_do){
+            step_y(start_pos);
+            ++current_delta_y;
         }
-        else if(position.first < 2*road_state.slots + road_state.lanes){
-            ++position.second;
+        else if(current_delta_x < delta_x_to_do){
+            if(dir == TURN_LEFT)
+                step_x_left(start_pos);
+            if(dir == TURN_RIGHT)
+                step_x_right(start_pos);
+
+            ++current_delta_x;
         }
-        mvwprintw(win, position.first, position.second, "E");
+
+        mvwprintw(win, position.first, position.second, symbol);
     }
 };

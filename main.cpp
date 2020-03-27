@@ -5,10 +5,9 @@
 
 #include "Emergency.cpp"
 
-//int lanes, slots, wall;
-char*** characters;
-Emergency* karetka;
-std::mutex map_mutex;
+//char*** characters;
+//Emergency* karetka;
+//std::mutex map_mutex;
 
 WINDOW* init_map(RoadState &road_state)
 {
@@ -25,7 +24,7 @@ WINDOW* init_map(RoadState &road_state)
     initscr();
     cbreak();
     curs_set(0);
-    WINDOW* win = newwin(road_state.wall+2,road_state.wall+2,0,0);
+    WINDOW* win = newwin(road_state.wall+2, road_state.wall+2, 0, 0);
     return win;
 }
 
@@ -59,15 +58,15 @@ void draw_map(WINDOW* win, RoadState& road_state)
     wrefresh(win);
 }
 
-void draw_E(WINDOW* win)
+void draw_E(WINDOW* win,Emergency* karetka, Movement_direction where)
 {
-    karetka->set_on_junction(2);
+  //  karetka->set_on_junction(FROM);
+    karetka->calculate_movement_to_do(where);
     wrefresh(win);
     while (true)
     {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-        karetka->move();
-        std::lock_guard<std::mutex> guard(map_mutex);
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        karetka->move(where);
         wrefresh(win);
     }
 }
@@ -81,18 +80,15 @@ int main(int argc, char* argv[])
     WINDOW* win;
     RoadState road_state(atoi(argv[1]), atoi(argv[2]));
 
-    //lanes = atoi(argv[1]);
-    //slots = atoi(argv[2]);
-    //wall = 2 * slots + lanes;
-
     win = init_map(road_state);
     draw_map(win, road_state);
-    karetka = new Emergency(win, road_state, 1);//!!!!!!!!!
 
     std::thread input(read_input);
-    std::thread moveER(draw_E,win);
-    input.join();
+
+    Emergency* karetka = new Emergency(win, road_state, RIGHT);
+    std::thread moveER(draw_E, win, karetka, TURN_LEFT);
     moveER.join();
+    input.join();
 
     return 0;
 }
