@@ -7,10 +7,13 @@
 
 WINDOW* init_map(RoadState &road_state)
 {
+    int y_max_size, x_max_size;
+
     initscr();
+    getmaxyx(stdscr, y_max_size, x_max_size);
     cbreak();
     curs_set(0);
-    WINDOW* win = newwin(road_state.wall+2, road_state.wall+2, 0, 0);
+    WINDOW* win = newwin(road_state.wall+2, road_state.wall+2,y_max_size/2-road_state.wall/2,x_max_size/2-road_state.wall/2);
     return win;
 }
 
@@ -28,6 +31,7 @@ void read_input()
 
 void draw_map(WINDOW* win, RoadState& road_state)
 {
+
     box(win,0,0);
     //horizontal
     for(int i=0;i<road_state.lanes;++i){
@@ -73,8 +77,11 @@ int main(int argc, char* argv[])
     std::thread input(read_input);
 
     Emergency* karetka = new Emergency(win, road_state, RIGHT);
-    std::thread moveER(draw_E, win, karetka, TURN_LEFT);
+    // Emergency* karetka2 = new Emergency(win, road_state, LEFT);
+    std::thread moveER(draw_E, win, karetka, TURN_RIGHT);
+    // std::thread moveER2(draw_E, win, karetka2, TURN_RIGHT);
     moveER.join();
+    // moveER2.join();
     input.join();
 
     return 0;

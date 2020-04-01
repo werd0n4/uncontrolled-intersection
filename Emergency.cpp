@@ -46,7 +46,6 @@ class Emergency : protected Vehicle
                 break;
         }
         mvwprintw(win, position.first, position.second, symbol);
-        wrefresh(win);
     }
 
     void calculate_movement_to_do(Movement_direction dir){
@@ -88,7 +87,7 @@ class Emergency : protected Vehicle
         switch (start_pos)
         {
         case RIGHT:
-            position.second--;
+            position.first--;
             break;
         case LEFT:
             position.first++;
