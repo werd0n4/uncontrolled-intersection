@@ -23,6 +23,7 @@ class Emergency : protected Vehicle
 
     ~Emergency(){
         mvwprintw(win, position.first, position.second, ".");
+        wrefresh(win);
     }
 
     void set_on_junction(int start_pos)
@@ -46,6 +47,7 @@ class Emergency : protected Vehicle
                 break;
         }
         mvwprintw(win, position.first, position.second, symbol);
+        wrefresh(win);
     }
 
     void calculate_movement_to_do(Movement_direction dir){
@@ -141,6 +143,7 @@ class Emergency : protected Vehicle
         }
 
         mvwprintw(win, position.first, position.second, symbol);
+        wrefresh(win);
     }
 
     bool getHasArrived(){

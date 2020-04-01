@@ -5,6 +5,8 @@
 
 #include "Emergency.cpp"
 
+std::mutex mtx;
+
 WINDOW* init_map(RoadState &road_state)
 {
     int y_max_size, x_max_size;
@@ -13,7 +15,10 @@ WINDOW* init_map(RoadState &road_state)
     getmaxyx(stdscr, y_max_size, x_max_size);
     cbreak();
     curs_set(0);
-    WINDOW* win = newwin(road_state.wall+2, road_state.wall+2,y_max_size/2-road_state.wall/2,x_max_size/2-road_state.wall/2);
+    WINDOW* win = newwin(road_state.wall+2,
+                        road_state.wall+2,
+                        y_max_size/2-road_state.wall/2,
+                        x_max_size/2-road_state.wall/2);
     return win;
 }
 
@@ -50,16 +55,19 @@ void draw_map(WINDOW* win, RoadState& road_state)
 
 void draw_E(WINDOW* win,Emergency* karetka, Movement_direction where)
 {
+    mtx.lock();
     karetka->calculate_movement_to_do(where);
-    wrefresh(win);
+    mtx.unlock();
     while (!karetka->getHasArrived())
     {
         std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        mtx.lock();
         karetka->move(where);
-        wrefresh(win);
+        mtx.unlock();
     }
+    mtx.lock();
     karetka->~Emergency();
-    wrefresh(win);
+    mtx.unlock();
 }
 
 int main(int argc, char* argv[])
@@ -76,12 +84,18 @@ int main(int argc, char* argv[])
 
     std::thread input(read_input);
 
-    Emergency* karetka = new Emergency(win, road_state, RIGHT);
-    // Emergency* karetka2 = new Emergency(win, road_state, LEFT);
-    std::thread moveER(draw_E, win, karetka, TURN_RIGHT);
-    // std::thread moveER2(draw_E, win, karetka2, TURN_RIGHT);
-    moveER.join();
-    // moveER2.join();
+    Emergency* karetkaR = new Emergency(win, road_state, RIGHT);
+    Emergency* karetkaL = new Emergency(win, road_state, LEFT);
+    Emergency* karetkaT = new Emergency(win, road_state, TOP);
+    Emergency* karetkaB = new Emergency(win, road_state, BOT);
+    std::thread moveER_R(draw_E, win, karetkaR, TURN_RIGHT);
+    std::thread moveER_L(draw_E, win, karetkaL, TURN_RIGHT);
+    std::thread moveER_T(draw_E, win, karetkaT, TURN_RIGHT);
+    std::thread moveER_B(draw_E, win, karetkaB, TURN_RIGHT);
+    moveER_R.join();
+    moveER_L.join();
+    moveER_T.join();
+    moveER_B.join();
     input.join();
 
     return 0;
