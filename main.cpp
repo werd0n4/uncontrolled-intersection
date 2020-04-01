@@ -5,22 +5,8 @@
 
 #include "Emergency.cpp"
 
-//char*** characters;
-//Emergency* karetka;
-//std::mutex map_mutex;
-
 WINDOW* init_map(RoadState &road_state)
 {
-    //characters = new char**[wall];
-    // for(int i=0;i<wall;i++){
-    //     characters[i]=new char*[wall];
-    // }
-
-    // for(int i=0;i<wall;++i){
-    //     for(int j=0;j<wall;++j){
-    //         characters[i][j]=(char*)".";
-    //     }
-    // }
     initscr();
     cbreak();
     curs_set(0);
@@ -60,15 +46,16 @@ void draw_map(WINDOW* win, RoadState& road_state)
 
 void draw_E(WINDOW* win,Emergency* karetka, Movement_direction where)
 {
-  //  karetka->set_on_junction(FROM);
     karetka->calculate_movement_to_do(where);
     wrefresh(win);
-    while (true)
+    while (!karetka->getHasArrived())
     {
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
         karetka->move(where);
         wrefresh(win);
     }
+    karetka->~Emergency();
+    wrefresh(win);
 }
 
 int main(int argc, char* argv[])

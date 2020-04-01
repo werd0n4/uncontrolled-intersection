@@ -18,6 +18,11 @@ class Emergency : protected Vehicle
         this->symbol = (char*)"E";
         this->start_pos = start;
         this->set_on_junction(start_pos); 
+        this->hasArrived = false;
+    }
+
+    ~Emergency(){
+        mvwprintw(win, position.first, position.second, ".");
     }
 
     void set_on_junction(int start_pos)
@@ -132,7 +137,14 @@ class Emergency : protected Vehicle
 
             ++current_delta_x;
         }
+        else{
+            this->hasArrived = true;
+        }
 
         mvwprintw(win, position.first, position.second, symbol);
+    }
+
+    bool getHasArrived(){
+        return this->hasArrived;
     }
 };
