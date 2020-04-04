@@ -2,7 +2,7 @@
 #include <thread>
 #include "Vehicle.cpp"
 
-class Emergency : protected Vehicle
+class Emergency : public Vehicle
 {
     private:
         int delta_y_to_do = 0;
@@ -17,7 +17,7 @@ class Emergency : protected Vehicle
         this->win = win;
         this->symbol = (char*)"E";
         this->start_pos = start;
-        this->set_on_junction(start_pos); 
+        // this->set_on_junction(start_pos); 
         this->hasArrived = false;
     }
 
@@ -46,11 +46,13 @@ class Emergency : protected Vehicle
                 position.second = 2*road_state.slots + road_state.lanes;
                 break;
         }
-        // while(! road_state.occupied_positions[position.first][position.second]){
-        //     std::this_thread::sleep_for(std::chrono::milliseconds(200));
-        // }
+        if(road_state.occupied_positions[position.second][position.first]){
+            // position.first-=1;
+            this->symbol=(char*)"C";
+        }
 
-        // this->road_state.occupied_positions[position.first][position.second] = true;
+        this->road_state.occupied_positions[position.second][position.first] = true;
+        this->road_state.occupied_positions[position.first][position.second] = true;
         mvwprintw(win, position.first, position.second, symbol);
         wrefresh(win);
     }
@@ -130,7 +132,7 @@ class Emergency : protected Vehicle
     {
 
         mvwprintw(win, position.first, position.second, "."); // zwolnienie pozycji?
-        // this->road_state.occupied_positions[position.first][position.second] = false;
+        this->road_state.occupied_positions[position.first][position.second] = false;
 
         if(current_delta_y < delta_y_to_do){
             step_y(start_pos);
@@ -147,7 +149,7 @@ class Emergency : protected Vehicle
         else{
             this->hasArrived = true;
         }
-        // this->road_state.occupied_positions[position.first][position.second] = true;
+        this->road_state.occupied_positions[position.first][position.second] = true;
         mvwprintw(win, position.first, position.second, symbol);
         wrefresh(win);
     }

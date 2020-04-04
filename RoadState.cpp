@@ -31,10 +31,10 @@ struct RoadState {
         start_positions[1] = std::make_tuple(slots + 1, 2*slots + lanes);//right
         end_positions[1] = std::make_tuple(slots + 2, 2*slots + lanes);
 
-        this->occupied_positions.resize(wall);
-        for (int i = 0; i < wall; i++)
+        this->occupied_positions.resize(wall+2);
+        for (int i = 0; i < wall+2; i++)
         {
-            occupied_positions[i].resize(wall);
+            occupied_positions[i].resize(wall+2);
         }
     }
 };
