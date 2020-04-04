@@ -46,15 +46,13 @@ class Emergency : public Vehicle
                 position.second = 2*road_state.slots + road_state.lanes;
                 break;
         }
-        while(road_state.occupied_positions[position.second][position.first]){
+        while(OCCUPIED_POSITIONS[position.second][position.first]){
             // position.first-=1;
             std::this_thread::sleep_for(std::chrono::milliseconds(200));
             this->symbol=(char*)"C";
         }
 
-        this->road_state.occupied_positions[position.second][position.first] = true;
-        this->road_state.occupied_positions[position.first][position.second] = true;
-         std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        OCCUPIED_POSITIONS[position.second][position.first] = true;
         mvwprintw(win, position.first, position.second, symbol);
         wrefresh(win);
     }
@@ -134,7 +132,7 @@ class Emergency : public Vehicle
     {
 
         mvwprintw(win, position.first, position.second, "."); // zwolnienie pozycji?
-        this->road_state.occupied_positions[position.first][position.second] = false;
+        OCCUPIED_POSITIONS[position.second][position.first] = false;
 
         if(current_delta_y < delta_y_to_do){
             step_y(start_pos);
@@ -151,7 +149,7 @@ class Emergency : public Vehicle
         else{
             this->hasArrived = true;
         }
-        this->road_state.occupied_positions[position.first][position.second] = true;
+        OCCUPIED_POSITIONS[position.second][position.first] = true;
         mvwprintw(win, position.first, position.second, symbol);
         wrefresh(win);
     }

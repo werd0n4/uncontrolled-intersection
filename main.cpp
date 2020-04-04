@@ -2,11 +2,12 @@
 #include <ncurses.h>
 #include <thread>
 #include <mutex>
-
+#include <atomic>
+#include "common.h"
 #include "Emergency.cpp"
 
 std::mutex mtx;
-
+std::vector<std::vector<bool>> OCCUPIED_POSITIONS;
 WINDOW* init_map(RoadState &road_state)
 {
     int y_max_size, x_max_size;
@@ -42,7 +43,7 @@ void draw_map(WINDOW* win, RoadState& road_state)
     for(int i=0;i<road_state.lanes;++i){
         for(int j=1;j<road_state.wall+1;++j){
             mvwprintw(win, road_state.slots+i+1,j , ".");
-            road_state.occupied_positions[j][road_state.slots+i+1] = false;
+            OCCUPIED_POSITIONS[j][road_state.slots+i+1] = false;
         }
     }
 
@@ -50,7 +51,7 @@ void draw_map(WINDOW* win, RoadState& road_state)
     for(int i = 0; i < road_state.lanes;++i){
         for(int j=1;j < road_state.wall+1;++j){
             mvwprintw(win, j, road_state.slots+i+1, ".");
-            road_state.occupied_positions[road_state.slots+i+1][j] = false;
+            OCCUPIED_POSITIONS[road_state.slots+i+1][j] = false;
         }
     }
     wrefresh(win);
@@ -83,6 +84,7 @@ int main(int argc, char* argv[])
         return 0;
     }
     WINDOW* win;
+
     RoadState road_state(atoi(argv[1]), atoi(argv[2]));
 
     win = init_map(road_state);
