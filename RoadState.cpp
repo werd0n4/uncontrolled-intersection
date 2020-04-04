@@ -1,4 +1,5 @@
 #include <tuple>
+#include <vector>
 
 struct RoadState {
     int slots;
@@ -6,6 +7,7 @@ struct RoadState {
     int wall;
     std::tuple<int, int> start_positions[4];// top, right, bot, left;//tuple contains start start_positions on roads (y,x)
     std::tuple<int, int> end_positions[4];//top, right, bot, left
+    std::vector<std::vector<bool>> occupied_positions;
 
     RoadState(){
         this->slots=0;
@@ -13,7 +15,7 @@ struct RoadState {
         wall=0;
     }
 
-    RoadState(int lanes, int slots){
+    RoadState(int lanes, int slots){        
         this->slots = slots;
         this->lanes = lanes;
         wall = 2*slots + lanes;
@@ -28,5 +30,11 @@ struct RoadState {
 
         start_positions[1] = std::make_tuple(slots + 1, 2*slots + lanes);//right
         end_positions[1] = std::make_tuple(slots + 2, 2*slots + lanes);
+
+        this->occupied_positions.resize(wall);
+        for (int i = 0; i < wall; i++)
+        {
+            occupied_positions[i].resize(wall);
+        }
     }
 };

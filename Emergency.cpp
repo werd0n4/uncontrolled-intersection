@@ -1,5 +1,5 @@
 #include <ncurses.h>
-
+#include <thread>
 #include "Vehicle.cpp"
 
 class Emergency : protected Vehicle
@@ -46,6 +46,11 @@ class Emergency : protected Vehicle
                 position.second = 2*road_state.slots + road_state.lanes;
                 break;
         }
+        // while(! road_state.occupied_positions[position.first][position.second]){
+        //     std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        // }
+
+        // this->road_state.occupied_positions[position.first][position.second] = true;
         mvwprintw(win, position.first, position.second, symbol);
         wrefresh(win);
     }
@@ -124,7 +129,8 @@ class Emergency : protected Vehicle
     void move(Movement_direction dir)
     {
 
-        mvwprintw(win, position.first, position.second, ".");
+        mvwprintw(win, position.first, position.second, "."); // zwolnienie pozycji?
+        // this->road_state.occupied_positions[position.first][position.second] = false;
 
         if(current_delta_y < delta_y_to_do){
             step_y(start_pos);
@@ -141,7 +147,7 @@ class Emergency : protected Vehicle
         else{
             this->hasArrived = true;
         }
-
+        // this->road_state.occupied_positions[position.first][position.second] = true;
         mvwprintw(win, position.first, position.second, symbol);
         wrefresh(win);
     }

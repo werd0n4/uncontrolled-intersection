@@ -42,22 +42,23 @@ void draw_map(WINDOW* win, RoadState& road_state)
     for(int i=0;i<road_state.lanes;++i){
         for(int j=1;j<road_state.wall+1;++j){
             mvwprintw(win, road_state.slots+i+1,j , ".");
+            road_state.occupied_positions[road_state.slots+i+1][j] = false;
         }
     }
+
     //vertical
     for(int i = 0; i < road_state.lanes;++i){
         for(int j=1;j < road_state.wall+1;++j){
             mvwprintw(win, j, road_state.slots+i+1, ".");
+            road_state.occupied_positions[j][road_state.slots+i+1] = false;
         }
     }
     wrefresh(win);
 }
 
 void draw_E(WINDOW* win,Emergency* karetka, Movement_direction where)
-{
-    mtx.lock();
+{ 
     karetka->calculate_movement_to_do(where);
-    mtx.unlock();
     while (!karetka->getHasArrived())
     {
         std::this_thread::sleep_for(std::chrono::milliseconds(200));
@@ -88,14 +89,17 @@ int main(int argc, char* argv[])
     Emergency* karetkaL = new Emergency(win, road_state, LEFT);
     Emergency* karetkaT = new Emergency(win, road_state, TOP);
     Emergency* karetkaB = new Emergency(win, road_state, BOT);
+    Emergency* karetkaR2 = new Emergency(win, road_state, RIGHT);
     std::thread moveER_R(draw_E, win, karetkaR, TURN_RIGHT);
     std::thread moveER_L(draw_E, win, karetkaL, TURN_RIGHT);
     std::thread moveER_T(draw_E, win, karetkaT, TURN_RIGHT);
     std::thread moveER_B(draw_E, win, karetkaB, TURN_RIGHT);
+    // std::thread moveER_R2(draw_E, win, karetkaR2, TURN_RIGHT);
     moveER_R.join();
     moveER_L.join();
     moveER_T.join();
     moveER_B.join();
+    // moveER_R2.join();
     input.join();
 
     return 0;
