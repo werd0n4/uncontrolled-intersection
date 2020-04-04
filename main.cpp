@@ -67,9 +67,9 @@ void draw_E(WINDOW* win,Emergency* karetka, Movement_direction where)
     while (!karetka->getHasArrived())
     {
         std::this_thread::sleep_for(std::chrono::milliseconds(200));
-        //mtx.lock();
-       // karetka->move(where);
-        //mtx.unlock();
+        mtx.lock();
+        karetka->move(where);
+        mtx.unlock();
     }
     mtx.lock();
     karetka->~Emergency();
@@ -99,7 +99,7 @@ int main(int argc, char* argv[])
     std::thread moveER_L(draw_E, win, karetkaL, TURN_RIGHT);
     std::thread moveER_T(draw_E, win, karetkaT, TURN_RIGHT);
     std::thread moveER_B(draw_E, win, karetkaB, TURN_RIGHT);
-    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    // std::this_thread::sleep_for(std::chrono::milliseconds(200));
     std::thread moveER_R2(draw_E, win, karetkaR2, TURN_RIGHT);
     moveER_R.join();
     moveER_L.join();

@@ -46,13 +46,15 @@ class Emergency : public Vehicle
                 position.second = 2*road_state.slots + road_state.lanes;
                 break;
         }
-        if(road_state.occupied_positions[position.second][position.first]){
+        while(road_state.occupied_positions[position.second][position.first]){
             // position.first-=1;
+            std::this_thread::sleep_for(std::chrono::milliseconds(200));
             this->symbol=(char*)"C";
         }
 
         this->road_state.occupied_positions[position.second][position.first] = true;
         this->road_state.occupied_positions[position.first][position.second] = true;
+         std::this_thread::sleep_for(std::chrono::milliseconds(200));
         mvwprintw(win, position.first, position.second, symbol);
         wrefresh(win);
     }
