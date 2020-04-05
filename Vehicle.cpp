@@ -19,6 +19,7 @@ class Vehicle
         std::pair<int,int> position;//(y,x)
         bool hasArrived;
         bool isOnMap;
+        int default_speed;
         
     public:
         virtual void move(Movement_direction) = 0;

@@ -22,6 +22,7 @@ class Emergency : public Vehicle
         // this->set_on_junction(start_pos); 
         this->hasArrived = false;
         this->isOnMap = false;
+        this->default_speed = 500;
     }
 
     ~Emergency(){
@@ -161,5 +162,9 @@ class Emergency : public Vehicle
 
     bool getIsOnMap(){
         return this->isOnMap;
+    }
+
+    int getDefaultSpeed(){
+        return this->default_speed;
     }
 };

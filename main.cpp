@@ -6,6 +6,7 @@
 
 std::mutex mtx;
 // std::vector<std::vector<bool>> OCCUPIED_POSITIONS;
+
 WINDOW* init_map(RoadState* road_state)
 {
     int y_max_size, x_max_size;
@@ -59,7 +60,7 @@ void draw_E(WINDOW* win,Emergency* karetka, Movement_direction where)
 {
     karetka->calculate_movement_to_do(where);
 
-    while(true){
+    while(true){//Seting vehicle on the road
         mtx.lock();
         karetka->set_on_junction();
         mtx.unlock();
@@ -67,13 +68,13 @@ void draw_E(WINDOW* win,Emergency* karetka, Movement_direction where)
             break;
         }
         else{
-            std::this_thread::sleep_for(std::chrono::milliseconds(500));
+            std::this_thread::sleep_for(std::chrono::milliseconds(karetka->getDefaultSpeed()));
         }
     } 
 
     while (!karetka->getHasArrived())
     {
-        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        std::this_thread::sleep_for(std::chrono::milliseconds(karetka->getDefaultSpeed()));
         mtx.lock();
         karetka->move(where);
         mtx.unlock();
