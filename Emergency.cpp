@@ -1,4 +1,5 @@
 #include <ncurses.h>
+#include <mutex>
 #include <thread>
 #include "Vehicle.cpp"
 
@@ -9,9 +10,10 @@ class Emergency : public Vehicle
         int delta_x_to_do = 0;
         int current_delta_y = 0;
         int current_delta_x = 0;
+        std::mutex mtx;
 
     public:
-    Emergency(WINDOW* win, RoadState road_state, Road_Pos start)
+    Emergency(WINDOW* win, RoadState* road_state, Road_Pos start)
     {
         this->road_state = road_state;
         this->win = win;
@@ -19,6 +21,7 @@ class Emergency : public Vehicle
         this->start_pos = start;
         // this->set_on_junction(start_pos); 
         this->hasArrived = false;
+        this->isOnMap = false;
     }
 
     ~Emergency(){
@@ -26,50 +29,48 @@ class Emergency : public Vehicle
         wrefresh(win);
     }
 
-    void set_on_junction(int start_pos)
+    void set_on_junction()
     {
-        switch(start_pos){
+        switch(this->start_pos){
             case 0://top
                 position.first = 1;
-                position.second = road_state.slots+1;
+                position.second = road_state->slots+1;
                 break;
             case 2://bot
-                position.first = 2*road_state.slots + road_state.lanes;
-                position.second = road_state.slots+road_state.lanes;
+                position.first = 2*road_state->slots + road_state->lanes;
+                position.second = road_state->slots+road_state->lanes;
                 break;
             case 3://left
-                position.first = road_state.slots + road_state.lanes;
+                position.first = road_state->slots + road_state->lanes;
                 position.second = 1;
                 break;
             case 1://right
-                position.first = road_state.slots+1;
-                position.second = 2*road_state.slots + road_state.lanes;
+                position.first = road_state->slots+1;
+                position.second = 2*road_state->slots + road_state->lanes;
                 break;
         }
-        while(OCCUPIED_POSITIONS[position.second][position.first]){
-            // position.first-=1;
-            std::this_thread::sleep_for(std::chrono::milliseconds(200));
-            this->symbol=(char*)"C";
+        if(road_state->OCCUPIED_POSITIONS[position.second][position.first]){
+            return;
         }
-
-        OCCUPIED_POSITIONS[position.second][position.first] = true;
+        road_state->OCCUPIED_POSITIONS[position.second][position.first] = true;
         mvwprintw(win, position.first, position.second, symbol);
         wrefresh(win);
+        this->isOnMap = true;
     }
 
     void calculate_movement_to_do(Movement_direction dir){
         switch(dir){
             case FORWARD:
-                delta_y_to_do = 2*road_state.slots + road_state.lanes-1;
+                delta_y_to_do = 2*road_state->slots + road_state->lanes-1;
                 delta_x_to_do = 0;
                 break;
             case TURN_RIGHT:
-                delta_y_to_do = road_state.slots;
-                delta_x_to_do = road_state.slots;
+                delta_y_to_do = road_state->slots;
+                delta_x_to_do = road_state->slots;
                 break;
             case TURN_LEFT:
-                delta_y_to_do = road_state.slots + road_state.lanes-1;
-                delta_x_to_do = road_state.slots + road_state.lanes-1;
+                delta_y_to_do = road_state->slots + road_state->lanes-1;
+                delta_x_to_do = road_state->slots + road_state->lanes-1;
                 break;
         }
     }
@@ -132,7 +133,7 @@ class Emergency : public Vehicle
     {
 
         mvwprintw(win, position.first, position.second, "."); // zwolnienie pozycji?
-        OCCUPIED_POSITIONS[position.second][position.first] = false;
+        road_state->OCCUPIED_POSITIONS[position.second][position.first] = false;
 
         if(current_delta_y < delta_y_to_do){
             step_y(start_pos);
@@ -149,12 +150,16 @@ class Emergency : public Vehicle
         else{
             this->hasArrived = true;
         }
-        OCCUPIED_POSITIONS[position.second][position.first] = true;
+        road_state->OCCUPIED_POSITIONS[position.second][position.first] = true;
         mvwprintw(win, position.first, position.second, symbol);
         wrefresh(win);
     }
 
     bool getHasArrived(){
         return this->hasArrived;
+    }
+
+    bool getIsOnMap(){
+        return this->isOnMap;
     }
 };

@@ -15,9 +15,10 @@ class Vehicle
     protected:
         WINDOW* win;
         char* symbol;
-        RoadState road_state;
+        RoadState* road_state;
         std::pair<int,int> position;//(y,x)
         bool hasArrived;
+        bool isOnMap;
         
     public:
         virtual void move(Movement_direction) = 0;
