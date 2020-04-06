@@ -21,13 +21,22 @@ WINDOW* init_map(RoadState* road_state)
     return win;
 }
 
-void read_input()
+void read_input(std::vector<Car*>* cars)
 {
-    while (true)
+    bool quit = false;
+    while (!quit)
     {
-        if(std::cin.get() == 27){
-            endwin();
-            break;
+        switch(std::cin.get()){
+            case 189://MINUS - slow down cars
+                for(auto& car : *cars){
+                    car->slowDown();
+                }
+                break;
+
+            case 27://ESC - exit program
+                endwin();
+                quit = true;
+                break;
         }
     }
     exit(0);
@@ -55,34 +64,34 @@ void draw_map(WINDOW* win, RoadState* road_state)
     wrefresh(win);
 }
 
-void draw_E(WINDOW* win,Car* karetka, Movement_direction where)
+void draw_E(WINDOW* win,Car* car, Movement_direction where)
 {
-    karetka->calculate_movement_to_do(where);
+    car->calculate_movement_to_do(where);
 
     while(true){//Setting vehicle on the road
         mtx.lock();
-        bool isStartPositionOccupied = karetka->isStartPositionOccupied();
+        bool isStartPositionOccupied = car->isStartPositionOccupied();
         mtx.unlock();
         if(!isStartPositionOccupied){
             mtx.lock();
-            karetka->set_on_junction();
+            car->set_on_junction();
             mtx.unlock();
             break;
         }
         else{
-            std::this_thread::sleep_for(std::chrono::milliseconds(karetka->getDefaultSpeed()));
+            std::this_thread::sleep_for(std::chrono::milliseconds(car->getDefaultSpeed()));
         }
     } 
     //car is driving
-    while (!karetka->getHasArrived())
+    while (!car->getHasArrived())
     {
-        std::this_thread::sleep_for(std::chrono::milliseconds(karetka->getDefaultSpeed()));
+        std::this_thread::sleep_for(std::chrono::milliseconds(car->getDefaultSpeed()));
         mtx.lock();
-        karetka->move(where);
+        car->move(where);
         mtx.unlock();
     }
     mtx.lock();
-    karetka->~Car();
+    car->~Car();
     mtx.unlock();
 }
 
@@ -99,21 +108,24 @@ int main(int argc, char* argv[])
     win = init_map(road_state);
     draw_map(win, road_state);
 
-    std::thread input(read_input);
-
-    // Car* karetkaR = new Car(win, road_state, RIGHT);
-    Car* karetkaL = new Car(win, road_state, LEFT);
-    Car* karetkaT = new Car(win, road_state, TOP);
-    // Car* karetkaB = new Car(win, road_state, BOT);
-    // Car* karetkaR2 = new Car(win, road_state, RIGHT);
-    // Car* karetkaT2 = new Car(win, road_state, TOP);
-    // std::thread moveER_R(draw_E, win, karetkaR, FORWARD);
-    std::thread moveER_T(draw_E, win, karetkaT, FORWARD);
+    std::vector<Car*> cars;
+    // Car* carR = new Car(win, road_state, RIGHT);
+    Car* carL = new Car(win, road_state, LEFT);
+    Car* carT = new Car(win, road_state, TOP);
+    // Car* carB = new Car(win, road_state, BOT);
+    // Car* carR2 = new Car(win, road_state, RIGHT);
+    // Car* carT2 = new Car(win, road_state, TOP);
+    // std::thread moveER_R(draw_E, win, carR, FORWARD);
+    
+    cars.push_back(carL);
+    cars.push_back(carT);
+    std::thread input(read_input, &cars);
+    std::thread moveER_T(draw_E, win, carT, FORWARD);
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    std::thread moveER_L(draw_E, win, karetkaL, FORWARD);
-    // std::thread moveER_B(draw_E, win, karetkaB, TURN_RIGHT);
-    // std::thread moveER_R2(draw_E, win, karetkaR2, FORWARD);
-    // std::thread moveER_T2(draw_E, win, karetkaT2, FORWARD);
+    std::thread moveER_L(draw_E, win, carL, FORWARD);
+    // std::thread moveER_B(draw_E, win, carB, TURN_RIGHT);
+    // std::thread moveER_R2(draw_E, win, carR2, FORWARD);
+    // std::thread moveER_T2(draw_E, win, carT2, FORWARD);
     // moveER_R.join();
     moveER_L.join();
     moveER_T.join();

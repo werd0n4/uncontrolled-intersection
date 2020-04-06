@@ -17,11 +17,11 @@ class Car : public Vehicle
     {
         this->road_state = road_state;
         this->win = win;
-        this->symbol = (char*)"E";
+        this->symbol = (char*)"C";
         this->start_pos = start;
         // this->set_on_junction(start_pos); 
         this->hasArrived = false;
-        this->default_speed = 500;
+        this->speed = 500;
 
         switch(this->start_pos){
             case 0://top
@@ -157,10 +157,15 @@ class Car : public Vehicle
     }
 
     int getDefaultSpeed(){
-        return this->default_speed;
+        return this->speed;
     }
 
     bool isStartPositionOccupied(){
         return road_state->OCCUPIED_POSITIONS[position.second][position.first];
+    }
+
+    void slowDown(){
+        if(this->speed < 1000)
+            this->speed += 100;
     }
 };

@@ -18,7 +18,7 @@ class Vehicle
         RoadState* road_state;
         std::pair<int,int> position;//(y,x)
         bool hasArrived;
-        int default_speed;
+        int speed;
         
     public:
         virtual void move(Movement_direction) = 0;
