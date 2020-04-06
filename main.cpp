@@ -5,7 +5,6 @@
 #include "Emergency.cpp"
 
 std::mutex mtx;
-// std::vector<std::vector<bool>> OCCUPIED_POSITIONS;
 
 WINDOW* init_map(RoadState* road_state)
 {
@@ -60,11 +59,12 @@ void draw_E(WINDOW* win,Emergency* karetka, Movement_direction where)
 {
     karetka->calculate_movement_to_do(where);
 
-    while(true){//Seting vehicle on the road
+    while(true){//Setting vehicle on the road
         mtx.lock();
-        karetka->set_on_junction();
+        bool isStartPositionOccupied = karetka->isStartPositionOccupied();
         mtx.unlock();
-        if(karetka->getIsOnMap()){
+        if(!isStartPositionOccupied){
+            karetka->set_on_junction();
             break;
         }
         else{

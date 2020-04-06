@@ -36,11 +36,5 @@ struct RoadState {
         {
             OCCUPIED_POSITIONS[i].resize(wall+2);
         }
-
-        // for(int i=0; i < wall+2; ++i){
-        //     for (int j=0; j< wall+2;++j){
-        //         OCCUPIED_POSITIONS[i][j] = false;
-        //     }
-        // }
     }
 };

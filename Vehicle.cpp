@@ -18,7 +18,6 @@ class Vehicle
         RoadState* road_state;
         std::pair<int,int> position;//(y,x)
         bool hasArrived;
-        bool isOnMap;
         int default_speed;
         
     public:

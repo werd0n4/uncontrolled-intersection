@@ -21,17 +21,8 @@ class Emergency : public Vehicle
         this->start_pos = start;
         // this->set_on_junction(start_pos); 
         this->hasArrived = false;
-        this->isOnMap = false;
         this->default_speed = 500;
-    }
 
-    ~Emergency(){
-        mvwprintw(win, position.first, position.second, ".");
-        wrefresh(win);
-    }
-
-    void set_on_junction()
-    {
         switch(this->start_pos){
             case 0://top
                 position.first = 1;
@@ -50,13 +41,18 @@ class Emergency : public Vehicle
                 position.second = 2*road_state->slots + road_state->lanes;
                 break;
         }
-        if(road_state->OCCUPIED_POSITIONS[position.second][position.first]){
-            return;
-        }
+    }
+
+    ~Emergency(){
+        mvwprintw(win, position.first, position.second, ".");
+        wrefresh(win);
+    }
+
+    void set_on_junction()
+    {
         road_state->OCCUPIED_POSITIONS[position.second][position.first] = true;
         mvwprintw(win, position.first, position.second, symbol);
         wrefresh(win);
-        this->isOnMap = true;
     }
 
     void calculate_movement_to_do(Movement_direction dir){
@@ -133,7 +129,7 @@ class Emergency : public Vehicle
     void move(Movement_direction dir)
     {
 
-        mvwprintw(win, position.first, position.second, "."); // zwolnienie pozycji?
+        mvwprintw(win, position.first, position.second, "."); // zwolnienie pozycji
         road_state->OCCUPIED_POSITIONS[position.second][position.first] = false;
 
         if(current_delta_y < delta_y_to_do){
@@ -160,11 +156,11 @@ class Emergency : public Vehicle
         return this->hasArrived;
     }
 
-    bool getIsOnMap(){
-        return this->isOnMap;
-    }
-
     int getDefaultSpeed(){
         return this->default_speed;
+    }
+
+    bool isStartPositionOccupied(){
+        return road_state->OCCUPIED_POSITIONS[position.second][position.first];
     }
 };
