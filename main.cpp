@@ -2,7 +2,7 @@
 #include <ncurses.h>
 #include <thread>
 #include <mutex>
-#include "Emergency.cpp"
+#include "Car.cpp"
 
 std::mutex mtx;
 
@@ -55,7 +55,7 @@ void draw_map(WINDOW* win, RoadState* road_state)
     wrefresh(win);
 }
 
-void draw_E(WINDOW* win,Emergency* karetka, Movement_direction where)
+void draw_E(WINDOW* win,Car* karetka, Movement_direction where)
 {
     karetka->calculate_movement_to_do(where);
 
@@ -73,7 +73,7 @@ void draw_E(WINDOW* win,Emergency* karetka, Movement_direction where)
             std::this_thread::sleep_for(std::chrono::milliseconds(karetka->getDefaultSpeed()));
         }
     } 
-
+    //car is driving
     while (!karetka->getHasArrived())
     {
         std::this_thread::sleep_for(std::chrono::milliseconds(karetka->getDefaultSpeed()));
@@ -82,7 +82,7 @@ void draw_E(WINDOW* win,Emergency* karetka, Movement_direction where)
         mtx.unlock();
     }
     mtx.lock();
-    karetka->~Emergency();
+    karetka->~Car();
     mtx.unlock();
 }
 
@@ -101,24 +101,25 @@ int main(int argc, char* argv[])
 
     std::thread input(read_input);
 
-    Emergency* karetkaR = new Emergency(win, road_state, RIGHT);
-    // Emergency* karetkaL = new Emergency(win, road_state, LEFT);
-    Emergency* karetkaT = new Emergency(win, road_state, TOP);
-    // Emergency* karetkaB = new Emergency(win, road_state, BOT);
-    Emergency* karetkaR2 = new Emergency(win, road_state, RIGHT);
-    Emergency* karetkaT2 = new Emergency(win, road_state, TOP);
-    std::thread moveER_R(draw_E, win, karetkaR, FORWARD);
-    // std::thread moveER_L(draw_E, win, karetkaL, TURN_RIGHT);
+    // Car* karetkaR = new Car(win, road_state, RIGHT);
+    Car* karetkaL = new Car(win, road_state, LEFT);
+    Car* karetkaT = new Car(win, road_state, TOP);
+    // Car* karetkaB = new Car(win, road_state, BOT);
+    // Car* karetkaR2 = new Car(win, road_state, RIGHT);
+    // Car* karetkaT2 = new Car(win, road_state, TOP);
+    // std::thread moveER_R(draw_E, win, karetkaR, FORWARD);
     std::thread moveER_T(draw_E, win, karetkaT, FORWARD);
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    std::thread moveER_L(draw_E, win, karetkaL, FORWARD);
     // std::thread moveER_B(draw_E, win, karetkaB, TURN_RIGHT);
-    std::thread moveER_R2(draw_E, win, karetkaR2, FORWARD);
-    std::thread moveER_T2(draw_E, win, karetkaT2, FORWARD);
-    moveER_R.join();
-    // moveER_L.join();
+    // std::thread moveER_R2(draw_E, win, karetkaR2, FORWARD);
+    // std::thread moveER_T2(draw_E, win, karetkaT2, FORWARD);
+    // moveER_R.join();
+    moveER_L.join();
     moveER_T.join();
     // moveER_B.join();
-    moveER_R2.join();
-    moveER_T2.join();
+    // moveER_R2.join();
+    // moveER_T2.join();
     input.join();
 
     return 0;

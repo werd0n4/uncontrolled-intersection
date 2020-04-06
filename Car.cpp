@@ -3,7 +3,7 @@
 #include <thread>
 #include "Vehicle.cpp"
 
-class Emergency : public Vehicle
+class Car : public Vehicle
 {
     private:
         int delta_y_to_do = 0;
@@ -13,7 +13,7 @@ class Emergency : public Vehicle
         std::mutex mtx;
 
     public:
-    Emergency(WINDOW* win, RoadState* road_state, Road_Pos start)
+    Car(WINDOW* win, RoadState* road_state, Road_Pos start)
     {
         this->road_state = road_state;
         this->win = win;
@@ -43,7 +43,7 @@ class Emergency : public Vehicle
         }
     }
 
-    ~Emergency(){
+    ~Car(){
         mvwprintw(win, position.first, position.second, ".");
         wrefresh(win);
     }
