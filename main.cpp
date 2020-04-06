@@ -64,7 +64,9 @@ void draw_E(WINDOW* win,Emergency* karetka, Movement_direction where)
         bool isStartPositionOccupied = karetka->isStartPositionOccupied();
         mtx.unlock();
         if(!isStartPositionOccupied){
+            mtx.lock();
             karetka->set_on_junction();
+            mtx.unlock();
             break;
         }
         else{
@@ -99,23 +101,23 @@ int main(int argc, char* argv[])
 
     std::thread input(read_input);
 
-    // Emergency* karetkaR = new Emergency(win, road_state, RIGHT);
+    Emergency* karetkaR = new Emergency(win, road_state, RIGHT);
     // Emergency* karetkaL = new Emergency(win, road_state, LEFT);
     Emergency* karetkaT = new Emergency(win, road_state, TOP);
     // Emergency* karetkaB = new Emergency(win, road_state, BOT);
-    // Emergency* karetkaR2 = new Emergency(win, road_state, RIGHT);
+    Emergency* karetkaR2 = new Emergency(win, road_state, RIGHT);
     Emergency* karetkaT2 = new Emergency(win, road_state, TOP);
-    // std::thread moveER_R(draw_E, win, karetkaR, TURN_RIGHT);
+    std::thread moveER_R(draw_E, win, karetkaR, FORWARD);
     // std::thread moveER_L(draw_E, win, karetkaL, TURN_RIGHT);
     std::thread moveER_T(draw_E, win, karetkaT, FORWARD);
     // std::thread moveER_B(draw_E, win, karetkaB, TURN_RIGHT);
-    // std::thread moveER_R2(draw_E, win, karetkaR2, TURN_RIGHT);
+    std::thread moveER_R2(draw_E, win, karetkaR2, FORWARD);
     std::thread moveER_T2(draw_E, win, karetkaT2, FORWARD);
-    // moveER_R.join();
+    moveER_R.join();
     // moveER_L.join();
     moveER_T.join();
     // moveER_B.join();
-    // moveER_R2.join();
+    moveER_R2.join();
     moveER_T2.join();
     input.join();
 
