@@ -1,5 +1,7 @@
 #include <tuple>
 #include <vector>
+#include <atomic>
+#include <iostream>
 
 struct RoadState {
     int slots;
@@ -7,7 +9,7 @@ struct RoadState {
     int wall;
     std::tuple<int, int> start_positions[4];// top, right, bot, left;//tuple contains start start_positions on roads (y,x)
     std::tuple<int, int> end_positions[4];//top, right, bot, left
-    std::vector<std::vector<bool>> OCCUPIED_POSITIONS;
+    std::atomic<bool>** OCCUPIED_POSITIONS;
 
     RoadState(){
         this->slots=0;
@@ -15,7 +17,8 @@ struct RoadState {
         wall=0;
     }
 
-    RoadState(int lanes, int slots){        
+    RoadState(int lanes, int slots)
+    {   
         this->slots = slots;
         this->lanes = lanes;
         wall = 2*slots + lanes;
@@ -31,10 +34,9 @@ struct RoadState {
         start_positions[1] = std::make_tuple(slots + 1, 2*slots + lanes);//right
         end_positions[1] = std::make_tuple(slots + 2, 2*slots + lanes);
 
-        OCCUPIED_POSITIONS.resize(wall+2);
-        for (int i = 0; i < wall+2; i++)
-        {
-            OCCUPIED_POSITIONS[i].resize(wall+2);
+        this->OCCUPIED_POSITIONS = new std::atomic<bool>* [wall + 2];
+        for(int i = 0; i < wall +2; ++i){
+            this->OCCUPIED_POSITIONS[i] = new std::atomic<bool> [wall + 2];
         }
     }
 };
