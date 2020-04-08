@@ -13,11 +13,11 @@ class Car : public Vehicle
         std::mutex mtx;
 
     public:
-    Car(WINDOW* win, RoadState* road_state, Road_Pos start)
+    Car(WINDOW* win, RoadState* road_state, Road_Pos start, char* sym)
     {
         this->road_state = road_state;
         this->win = win;
-        this->symbol = (char*)"C";
+        this->symbol = (char*)sym;
         this->start_pos = start;
         this->hasArrived = false;
         this->speed = 500;

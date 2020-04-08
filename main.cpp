@@ -120,10 +120,10 @@ int main(int argc, char* argv[])
 
     std::vector<Car*> cars;
     // Car* carR = new Car(win, road_state, RIGHT);
-    Car* carL = new Car(win, road_state, LEFT);
-    Car* carT = new Car(win, road_state, TOP);
+    Car* carL = new Car(win, road_state, LEFT, "A");
+    Car* carT = new Car(win, road_state, TOP, "B");
     // Car* carB = new Car(win, road_state, BOT);
-    Car* carR2 = new Car(win, road_state, RIGHT);
+    Car* carR2 = new Car(win, road_state, RIGHT, "C");
     // Car* carT2 = new Car(win, road_state, TOP);
     // std::thread moveER_R(draw_E, win, carR, FORWARD);
     
