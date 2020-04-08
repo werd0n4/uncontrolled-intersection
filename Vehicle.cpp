@@ -21,6 +21,6 @@ class Vehicle
         int speed;
         
     public:
-        virtual void move(Movement_direction) = 0;
+        virtual void move() = 0;
         Road_Pos start_pos;
 };
