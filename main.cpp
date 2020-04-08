@@ -134,13 +134,13 @@ int main(int argc, char* argv[])
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
     std::thread moveER_L(draw_E, win, carL, FORWARD);
     // std::thread moveER_B(draw_E, win, carB, TURN_RIGHT);
-    std::thread moveER_R2(draw_E, win, carR2, TURN_RIGHT);
+    // std::thread moveER_R2(draw_E, win, carR2, TURN_RIGHT);
     // std::thread moveER_T2(draw_E, win, carT2, FORWARD);
     // moveER_R.join();
     moveER_L.join();
     moveER_T.join();
     // moveER_B.join();
-    moveER_R2.join();
+    // moveER_R2.join();
     // moveER_T2.join();
     input.join();
 
