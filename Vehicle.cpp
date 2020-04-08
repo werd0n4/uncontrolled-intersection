@@ -15,12 +15,12 @@ class Vehicle
     protected:
         WINDOW* win;
         char* symbol;
-        RoadState* road_state;
-        std::pair<int,int> position;//(y,x)
         bool hasArrived;
         int speed;
         
     public:
+        RoadState* road_state;
         virtual void move() = 0;
+        std::pair<int,int> position;//(y,x)
         Road_Pos start_pos;
 };

@@ -92,6 +92,10 @@ void draw_E(WINDOW* win,Car* car, Movement_direction where)
 
         car->calculate_next_position(where);
 
+        while (car->road_state->OCCUPIED_POSITIONS[car->position.second][car->position.first])
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        }
         mtx.lock();
         car->move();
         mtx.unlock();

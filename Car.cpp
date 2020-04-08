@@ -168,12 +168,6 @@ class Car : public Vehicle
         // else{
         //     this->hasArrived = true;
         // }
-
-        while (road_state->OCCUPIED_POSITIONS[position.second][position.first])
-        {
-            std::this_thread::sleep_for(std::chrono::milliseconds(500));
-        }
-        
         road_state->OCCUPIED_POSITIONS[position.second][position.first] = true;
         mvwprintw(win, position.first, position.second, symbol);
         wrefresh(win);
