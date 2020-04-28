@@ -2,11 +2,12 @@
 #include <ncurses.h>
 #include <thread>
 #include <mutex>
+#include <memory>
 #include "Car.cpp"
 
 std::mutex mtx;
 
-WINDOW* init_map(RoadState* road_state)
+WINDOW* init_map(RoadState& road_state)
 {
     int y_max_size, x_max_size;
 
@@ -14,10 +15,10 @@ WINDOW* init_map(RoadState* road_state)
     getmaxyx(stdscr, y_max_size, x_max_size);
     cbreak();
     curs_set(0);
-    WINDOW* win = newwin(road_state->wall+2,
-                        road_state->wall+2,
-                        y_max_size/2-road_state->wall/2,
-                        x_max_size/2-road_state->wall/2);
+    WINDOW* win = newwin(road_state.wall+2,
+                        road_state.wall+2,
+                        y_max_size/2-road_state.wall/2,
+                        x_max_size/2-road_state.wall/2);
     return win;
 }
 
@@ -42,29 +43,29 @@ void read_input(std::vector<Car*>* cars)
     exit(0);
 }
 
-void draw_map(WINDOW* win, RoadState* road_state)
+void draw_map(WINDOW* win, RoadState& road_state)
 {
 
     box(win,0,0);
     //horizontal
-    for(int i=0;i<road_state->lanes;++i){
-        for(int j=1;j<road_state->wall+1;++j){
-            mvwprintw(win, road_state->slots+i+1,j , ".");
-            road_state->OCCUPIED_POSITIONS[j][road_state->slots+i+1] = false;
+    for(int i=0;i<road_state.lanes;++i){
+        for(int j=1;j<road_state.wall+1;++j){
+            mvwprintw(win, road_state.slots+i+1,j , ".");
+            road_state.OCCUPIED_POSITIONS[j][road_state.slots+i+1] = false;
         }
     }
 
     //vertical
-    for(int i = 0; i < road_state->lanes;++i){
-        for(int j=1;j < road_state->wall+1;++j){
-            mvwprintw(win, j, road_state->slots+i+1, ".");
-            road_state->OCCUPIED_POSITIONS[road_state->slots+i+1][j] = false;
+    for(int i = 0; i < road_state.lanes;++i){
+        for(int j=1;j < road_state.wall+1;++j){
+            mvwprintw(win, j, road_state.slots+i+1, ".");
+            road_state.OCCUPIED_POSITIONS[road_state.slots+i+1][j] = false;
         }
     }
     wrefresh(win);
 }
 
-void draw_E(WINDOW* win,Car* car, Movement_direction where)
+void draw_Car(WINDOW* win,Car* car, Movement_direction where)
 {
     car->calculate_movement_to_do(where);
 
@@ -91,8 +92,8 @@ void draw_E(WINDOW* win,Car* car, Movement_direction where)
         mtx.unlock();
 
         car->calculate_next_position(where);
-
-        while (car->road_state->OCCUPIED_POSITIONS[car->position.second][car->position.first])
+        
+        while (car->road_state.OCCUPIED_POSITIONS[car->position.second][car->position.first])
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
         }
@@ -113,34 +114,34 @@ int main(int argc, char* argv[])
     }
     WINDOW* win;
 
-    RoadState* road_state = new RoadState(atoi(argv[1]), atoi(argv[2]));
+    std::unique_ptr<RoadState> road_state = std::make_unique<RoadState>(atoi(argv[1]), atoi(argv[2]));
 
-    win = init_map(road_state);
-    draw_map(win, road_state);
+    win = init_map(*road_state);
+    draw_map(win, *road_state);
 
     std::vector<Car*> cars;
     // Car* carR = new Car(win, road_state, RIGHT);
-    Car* carL = new Car(win, road_state, LEFT, "A");
-    Car* carT = new Car(win, road_state, TOP, "B");
+    Car* carL = new Car(win, *road_state, LEFT, "A");
+    Car* carT = new Car(win, *road_state, TOP, "B");
     // Car* carB = new Car(win, road_state, BOT);
-    Car* carR2 = new Car(win, road_state, RIGHT, "C");
+    Car* carR2 = new Car(win, *road_state, RIGHT, "C");
     // Car* carT2 = new Car(win, road_state, TOP);
-    // std::thread moveER_R(draw_E, win, carR, FORWARD);
+    // std::thread moveER_R(draw_Car, win, carR, FORWARD);
     
     cars.push_back(carL);
     cars.push_back(carT);
     std::thread input(read_input, &cars);
-    std::thread moveER_T(draw_E, win, carT, FORWARD);
+    std::thread moveER_T(draw_Car, win, carT, FORWARD);
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    std::thread moveER_L(draw_E, win, carL, FORWARD);
-    // std::thread moveER_B(draw_E, win, carB, TURN_RIGHT);
-    // std::thread moveER_R2(draw_E, win, carR2, TURN_RIGHT);
-    // std::thread moveER_T2(draw_E, win, carT2, FORWARD);
+    std::thread moveER_L(draw_Car, win, carL, FORWARD);
+    // std::thread moveER_B(draw_Car, win, carB, TURN_RIGHT);
+    std::thread moveER_R2(draw_Car, win, carR2, TURN_RIGHT);
+    // std::thread moveER_T2(draw_Car, win, carT2, FORWARD);
     // moveER_R.join();
     moveER_L.join();
     moveER_T.join();
     // moveER_B.join();
-    // moveER_R2.join();
+    moveER_R2.join();
     // moveER_T2.join();
     input.join();
 

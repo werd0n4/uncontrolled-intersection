@@ -13,7 +13,7 @@ class Car : public Vehicle
         std::mutex mtx;
 
     public:
-    Car(WINDOW* win, RoadState* road_state, Road_Pos start, char* sym)
+    Car(WINDOW* win, RoadState& road_state, Road_Pos start, char* sym)
     {
         this->road_state = road_state;
         this->win = win;
@@ -25,19 +25,19 @@ class Car : public Vehicle
         switch(this->start_pos){
             case 0://top
                 position.first = 1;
-                position.second = road_state->slots+1;
+                position.second = road_state.slots+1;
                 break;
             case 2://bot
-                position.first = 2*road_state->slots + road_state->lanes;
-                position.second = road_state->slots+road_state->lanes;
+                position.first = 2*road_state.slots + road_state.lanes;
+                position.second = road_state.slots+road_state.lanes;
                 break;
             case 3://left
-                position.first = road_state->slots + road_state->lanes;
+                position.first = road_state.slots + road_state.lanes;
                 position.second = 1;
                 break;
             case 1://right
-                position.first = road_state->slots+1;
-                position.second = 2*road_state->slots + road_state->lanes;
+                position.first = road_state.slots+1;
+                position.second = 2*road_state.slots + road_state.lanes;
                 break;
         }
     }
@@ -49,7 +49,7 @@ class Car : public Vehicle
 
     void set_on_junction()
     {
-        road_state->OCCUPIED_POSITIONS[position.second][position.first] = true;
+        road_state.OCCUPIED_POSITIONS[position.second][position.first] = true;
         mvwprintw(win, position.first, position.second, symbol);
         wrefresh(win);
     }
@@ -57,16 +57,16 @@ class Car : public Vehicle
     void calculate_movement_to_do(Movement_direction dir){
         switch(dir){
             case FORWARD:
-                delta_y_to_do = 2*road_state->slots + road_state->lanes-1;
+                delta_y_to_do = 2*road_state.slots + road_state.lanes-1;
                 delta_x_to_do = 0;
                 break;
             case TURN_RIGHT:
-                delta_y_to_do = road_state->slots;
-                delta_x_to_do = road_state->slots;
+                delta_y_to_do = road_state.slots;
+                delta_x_to_do = road_state.slots;
                 break;
             case TURN_LEFT:
-                delta_y_to_do = road_state->slots + road_state->lanes-1;
-                delta_x_to_do = road_state->slots + road_state->lanes-1;
+                delta_y_to_do = road_state.slots + road_state.lanes-1;
+                delta_x_to_do = road_state.slots + road_state.lanes-1;
                 break;
         }
     }
@@ -127,7 +127,7 @@ class Car : public Vehicle
 
     void erase_last_position(){
         mvwprintw(win, position.first, position.second, "."); // zwolnienie pozycji
-        road_state->OCCUPIED_POSITIONS[position.second][position.first] = false;
+        road_state.OCCUPIED_POSITIONS[position.second][position.first] = false;
     }
 
     void calculate_next_position(Movement_direction dir){
@@ -168,7 +168,7 @@ class Car : public Vehicle
         // else{
         //     this->hasArrived = true;
         // }
-        road_state->OCCUPIED_POSITIONS[position.second][position.first] = true;
+        road_state.OCCUPIED_POSITIONS[position.second][position.first] = true;
         mvwprintw(win, position.first, position.second, symbol);
         wrefresh(win);
     }
@@ -182,7 +182,7 @@ class Car : public Vehicle
     }
 
     bool isStartPositionOccupied(){
-        return road_state->OCCUPIED_POSITIONS[position.second][position.first];
+        return road_state.OCCUPIED_POSITIONS[position.second][position.first];
     }
 
     void slowDown(){
