@@ -17,3 +17,14 @@ cd build
 cmake ../
 make
 ```
+
+Build docker image and run it
+```bash
+docker build -t trafficlights:latest .
+docker run -it trafficlights
+```
+
+Inside container we run program as in regulat terminal
+```bash
+./out.o parameters
+```
