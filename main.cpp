@@ -51,7 +51,7 @@ void draw_map(WINDOW* win, RoadState& road_state)
     for(int i=0;i<road_state.lanes;++i){
         for(int j=1;j<road_state.wall+1;++j){
             mvwprintw(win, road_state.slots+i+1,j , ".");
-            road_state.OCCUPIED_POSITIONS[j][road_state.slots+i+1] = false;
+            road_state.OCCUPIED_POSITIONS[i][road_state.slots+j+1] = false;
         }
     }
 
