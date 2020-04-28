@@ -24,7 +24,7 @@ docker build -t trafficlights:latest .
 docker run -it trafficlights
 ```
 
-Inside container we run program as in regulat terminal
+Inside container we run program as in regular terminal
 ```bash
 ./out.o parameters
 ```
