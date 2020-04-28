@@ -11,17 +11,10 @@ struct RoadState {
     std::tuple<int, int> end_positions[4];//top, right, bot, left
     std::atomic<bool>** OCCUPIED_POSITIONS;
 
-    RoadState(){
-        this->slots=0;
-        this->lanes=0;
-        wall=0;
-    }
+    RoadState(): slots(0), lanes(0), wall(0){ }
 
-    RoadState(int lanes, int slots)
+    RoadState(int _lanes, int _slots) : lanes(_lanes), slots(_slots), wall(2*slots+lanes)
     {   
-        this->slots = slots;
-        this->lanes = lanes;
-        wall = 2*slots + lanes;
         start_positions[0] = std::make_tuple(1, slots + 1);//top
         end_positions[0] = std::make_tuple(1, slots + 2);
 
