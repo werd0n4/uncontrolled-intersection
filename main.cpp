@@ -6,8 +6,11 @@
 #include "Car.cpp"
 
 std::mutex mtx;
+bool running = true;
+WINDOW* win;
+RoadState road_state;
 
-WINDOW* init_map(RoadState& road_state)
+WINDOW* init_map()
 {
     int y_max_size, x_max_size;
 
@@ -37,9 +40,8 @@ void read_input()
     exit(0);
 }
 
-void draw_map(WINDOW* win, RoadState& road_state)
+void draw_map()
 {
-
     box(win,0,0);
     //horizontal
     for(int i=0;i<road_state.lanes;++i){
@@ -59,7 +61,20 @@ void draw_map(WINDOW* win, RoadState& road_state)
     wrefresh(win);
 }
 
-void draw_Car(WINDOW* win,Car& car, Movement_direction where)
+void refreshScreen(std::vector<Car>& cars)
+{
+    while(running)
+    {
+        draw_map();
+        for(auto it = cars.begin(); it != cars.end(); ++it)
+        {
+            //rysowanie aut
+        }
+
+    }
+}
+
+void draw_Car(Car& car, Movement_direction where)
 {
     car.calculate_movement_to_do(where);
     bool carIsSet = false;
@@ -107,25 +122,23 @@ int main(int argc, char* argv[])
         std::cout << "Niepoprawna liczba argumentow!\nNalezy podac dwa argumenty"<<std::endl;
         return 0;
     }
-    WINDOW* win;
 
     std::vector<Car> cars;
     std::vector<std::thread> carThreads;
+    road_state = RoadState(atoi(argv[1]), atoi(argv[2]));
 
-    std::unique_ptr<RoadState> road_state = std::make_unique<RoadState>(atoi(argv[1]), atoi(argv[2]));
+    win = init_map();
+    draw_map();
 
-    win = init_map(*road_state);
-    draw_map(win, *road_state);
-
-    cars.push_back(Car(win, *road_state, LEFT, "A"));
-    cars.push_back(Car(win, *road_state, TOP, "B"));
-    cars.push_back(Car(win, *road_state, RIGHT, "C"));
+    cars.push_back(Car(win, road_state, LEFT, "A"));
+    cars.push_back(Car(win, road_state, TOP, "B"));
+    cars.push_back(Car(win, road_state, RIGHT, "C"));
 
     std::thread input([](){read_input();});
 
     for(auto it = cars.begin(); it != cars.end(); ++it)
     {
-        carThreads.push_back(std::thread([win, it](){draw_Car(win, *it, FORWARD);}));
+        carThreads.push_back(std::thread([it](){draw_Car(*it, FORWARD);}));
     }
     for(auto it = carThreads.begin(); it != carThreads.end(); ++it)
     {
