@@ -10,7 +10,6 @@ class Car : public Vehicle
         int delta_x_to_do = 0;
         int current_delta_y = 0;
         int current_delta_x = 0;
-        std::mutex mtx;
 
     public:
     Car(WINDOW* win, RoadState& road_state, Road_Pos start, char* sym)

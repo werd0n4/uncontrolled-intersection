@@ -59,45 +59,45 @@ void draw_map(WINDOW* win, RoadState& road_state)
     wrefresh(win);
 }
 
-void draw_Car(WINDOW* win,Car* car, Movement_direction where)
+void draw_Car(WINDOW* win,Car& car, Movement_direction where)
 {
-    car->calculate_movement_to_do(where);
+    car.calculate_movement_to_do(where);
     bool carIsSet = false;
 
     while(!carIsSet){//Setting vehicle on the road
         mtx.lock();
-        bool isStartPositionOccupied = car->isStartPositionOccupied();
+        bool isStartPositionOccupied = car.isStartPositionOccupied();
         mtx.unlock();
         if(!isStartPositionOccupied){
             mtx.lock();
-            car->set_on_junction();
+            car.set_on_junction();
             mtx.unlock();
             carIsSet = true;
         }
         else{
-            std::this_thread::sleep_for(std::chrono::milliseconds(car->getDefaultSpeed()));
+            std::this_thread::sleep_for(std::chrono::milliseconds(car.getDefaultSpeed()));
         }
     } 
     //car is driving
-    while (!car->getHasArrived())
+    while (!car.getHasArrived())
     {
-        std::this_thread::sleep_for(std::chrono::milliseconds(car->getDefaultSpeed()));
+        std::this_thread::sleep_for(std::chrono::milliseconds(car.getDefaultSpeed()));
         mtx.lock();
-        car->erase_last_position();
+        car.erase_last_position();
         mtx.unlock();
 
-        car->calculate_next_position(where);
+        car.calculate_next_position(where);
         
-        while (car->road_state.OCCUPIED_POSITIONS[car->position.second][car->position.first])
+        while (car.road_state.OCCUPIED_POSITIONS[car.position.second][car.position.first])
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
         }
         mtx.lock();
-        car->move();
+        car.move();
         mtx.unlock();
     }
     mtx.lock();
-    car->~Car();
+    car.~Car();
     mtx.unlock();
 }
 
@@ -109,33 +109,29 @@ int main(int argc, char* argv[])
     }
     WINDOW* win;
 
+    std::vector<Car> cars;
+    std::vector<std::thread> carThreads;
+
     std::unique_ptr<RoadState> road_state = std::make_unique<RoadState>(atoi(argv[1]), atoi(argv[2]));
 
     win = init_map(*road_state);
     draw_map(win, *road_state);
 
-    // Car* carR = new Car(win, road_state, RIGHT);
-    Car* carL = new Car(win, *road_state, LEFT, "A");
-    Car* carT = new Car(win, *road_state, TOP, "B");
-    // Car* carB = new Car(win, road_state, BOT);
-    Car* carR2 = new Car(win, *road_state, RIGHT, "C");
-    // Car* carT2 = new Car(win, road_state, TOP);
-    // std::thread moveER_R(draw_Car, win, carR, FORWARD);
-    
+    cars.push_back(Car(win, *road_state, LEFT, "A"));
+    cars.push_back(Car(win, *road_state, TOP, "B"));
+    cars.push_back(Car(win, *road_state, RIGHT, "C"));
+
     std::thread input([](){read_input();});
 
-    std::thread moveER_T([win, carT](){draw_Car(win, carT, FORWARD);});
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    std::thread moveER_L([win, carL](){draw_Car(win, carL, FORWARD);});
-    // std::thread moveER_B(draw_Car, win, carB, TURN_RIGHT);
-    std::thread moveER_R2([win, carR2](){draw_Car(win, carR2, TURN_RIGHT);});
-    // std::thread moveER_T2(draw_Car, win, carT2, FORWARD);
-    // moveER_R.join();
-    moveER_L.join();
-    moveER_T.join();
-    // moveER_B.join();
-    moveER_R2.join();
-    // moveER_T2.join();
+    for(auto it = cars.begin(); it != cars.end(); ++it)
+    {
+        carThreads.push_back(std::thread([win, it](){draw_Car(win, *it, FORWARD);}));
+    }
+    for(auto it = carThreads.begin(); it != carThreads.end(); ++it)
+    {
+        (*it).join();
+    }
+
     input.join();
 
     return 0;
