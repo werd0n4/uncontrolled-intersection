@@ -133,11 +133,12 @@ int main(int argc, char* argv[])
     road_state = RoadState(atoi(argv[1]), atoi(argv[2]));
 
     win = init_map();
-    draw_map();
+    // draw_map();
 
     cars.push_back(Car(win, road_state, LEFT, "A"));
     cars.push_back(Car(win, road_state, TOP, "B"));
     cars.push_back(Car(win, road_state, RIGHT, "C"));
+    cars.push_back(Car(win, road_state, RIGHT, "D"));
 
     std::thread input([](){read_input();});
 
