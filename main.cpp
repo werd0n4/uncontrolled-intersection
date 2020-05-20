@@ -63,14 +63,19 @@ void draw_map()
 
 void refreshScreen(std::vector<Car>& cars)
 {
+    std::pair<int, int> position;
     while(running)
     {
         draw_map();
         for(auto it = cars.begin(); it != cars.end(); ++it)
         {
             //rysowanie aut
+            position = (*it).getPosition();
+            mvwprintw(win, position.first, position.second, (*it).getSymbol());
+            wrefresh(win);
         }
 
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 }
 
@@ -140,11 +145,14 @@ int main(int argc, char* argv[])
     {
         carThreads.push_back(std::thread([it](){draw_Car(*it, FORWARD);}));
     }
+
+    std::thread screenRefresh([&cars](){refreshScreen(cars);});
+
     for(auto it = carThreads.begin(); it != carThreads.end(); ++it)
     {
         (*it).join();
     }
-
+    screenRefresh.join();
     input.join();
 
     return 0;

@@ -49,8 +49,8 @@ class Car : public Vehicle
     void set_on_junction()
     {
         road_state.OCCUPIED_POSITIONS[position.second][position.first] = true;
-        mvwprintw(win, position.first, position.second, symbol);
-        wrefresh(win);
+//----        mvwprintw(win, position.first, position.second, symbol);
+//----        wrefresh(win);
     }
 
     void calculate_movement_to_do(Movement_direction dir){
@@ -125,7 +125,7 @@ class Car : public Vehicle
     }
 
     void erase_last_position(){
-        mvwprintw(win, position.first, position.second, "."); // zwolnienie pozycji
+//-----        mvwprintw(win, position.first, position.second, "."); // zwolnienie pozycji
         road_state.OCCUPIED_POSITIONS[position.second][position.first] = false;
     }
 
@@ -168,8 +168,8 @@ class Car : public Vehicle
         //     this->hasArrived = true;
         // }
         road_state.OCCUPIED_POSITIONS[position.second][position.first] = true;
-        mvwprintw(win, position.first, position.second, symbol);
-        wrefresh(win);
+//----        mvwprintw(win, position.first, position.second, symbol);
+//----        wrefresh(win);
     }
 
     bool getHasArrived(){
@@ -187,5 +187,13 @@ class Car : public Vehicle
     void slowDown(){
         if(this->speed < 1000)
             this->speed += 100;
+    }
+
+    char* getSymbol(){
+        return symbol;
+    }
+
+    std::pair<int, int> getPosition(){
+        return position;
     }
 };
