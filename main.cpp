@@ -71,13 +71,12 @@ void refreshScreen(std::vector<Car>& cars)
         {
             //rysowanie aut
             position = (*it).getPosition();
-            // if(!(*it).getHasArrived()){
-            //     mvwprintw(win, position.first, position.second, (*it).getSymbol());
-            // }
-            // else{
-            //     mvwprintw(win, position.first, position.second, ".");
-            // }
-            mvwprintw(win, position.first, position.second, (*it).getSymbol());
+            if(!(*it).getHasArrived()){
+                mvwprintw(win, position.first, position.second, (*it).getSymbol());
+            }
+            else{
+                mvwprintw(win, position.first, position.second, ".");
+            }
             wrefresh(win);
         }
 
