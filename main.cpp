@@ -74,9 +74,10 @@ void refreshScreen(std::vector<Car>& cars)
             if(!(*it).getHasArrived()){
                 mvwprintw(win, position.first, position.second, (*it).getSymbol());
             }
-            else{
-                mvwprintw(win, position.first, position.second, ".");
-            }
+            // else{
+            //     cars.erase(it--);
+            //     mvwprintw(win, position.first, position.second, ".");
+            // }
             wrefresh(win);
         }
 
@@ -141,6 +142,7 @@ int main(int argc, char* argv[])
     // draw_map();
 
     cars.push_back(Car(win, road_state, LEFT, "A"));
+    cars.push_back(Car(win, road_state, LEFT, "E"));
     cars.push_back(Car(win, road_state, TOP, "B"));
     cars.push_back(Car(win, road_state, RIGHT, "C"));
     cars.push_back(Car(win, road_state, RIGHT, "D"));
