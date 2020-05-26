@@ -74,10 +74,6 @@ void refreshScreen(std::vector<Car>& cars)
             if(!(*it).getHasArrived()){
                 mvwprintw(win, position.first, position.second, (*it).getSymbol());
             }
-            // else{
-            //     cars.erase(it--);
-            //     mvwprintw(win, position.first, position.second, ".");
-            // }
             wrefresh(win);
         }
 
@@ -91,13 +87,9 @@ void draw_Car(Car& car, Movement_direction where)
     bool carIsSet = false;
 
     while(!carIsSet){//Setting vehicle on the road
-        // mtx.lock();
         bool isStartPositionOccupied = car.isStartPositionOccupied();
-        // mtx.unlock();
         if(!isStartPositionOccupied){
-            // mtx.lock();
             car.set_on_junction();
-            // mtx.unlock();
             carIsSet = true;
         }
         else{
@@ -110,9 +102,7 @@ void draw_Car(Car& car, Movement_direction where)
         std::this_thread::sleep_for(std::chrono::milliseconds(car.getSpeed()));
         car.move(where);
     }
-    // mtx.lock();
     car.~Car();
-    // mtx.unlock();
 }
 
 int main(int argc, char* argv[])

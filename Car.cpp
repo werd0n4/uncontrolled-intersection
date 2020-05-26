@@ -28,16 +28,10 @@ class Car
         std::pair<int,int> position;//(y,x)
         Road_Pos start_pos;
 
-    // public:
-    Car(WINDOW* win, RoadState* road_state, Road_Pos start, char* sym)
+    Car(WINDOW* _win, RoadState* _road_state, Road_Pos _start_pos, char* _symbol) : win(_win), road_state(_road_state), 
+                                                                                    symbol(_symbol), start_pos(_start_pos),
+                                                                                    hasArrived(false), speed(500)
     {
-        this->road_state = road_state;
-        this->win = win;
-        this->symbol = (char*)sym;
-        this->start_pos = start;
-        this->hasArrived = false;
-        this->speed = 500;
-
         switch(this->start_pos){
             case 0://top
                 position.first = 1;
@@ -59,15 +53,11 @@ class Car
     }
 
     ~Car(){
-        // mvwprintw(win, position.first, position.second, ".");
-        // wrefresh(win);
-        // road_state->OCCUPIED_POSITIONS[position.second][position.first] = false;
         road_state->setPositionFree(position.second, position.first);
     }
 
     void set_on_junction()
     {
-        // road_state->OCCUPIED_POSITIONS[position.second][position.first] = true;
         road_state->setPositionOccupied(position.second, position.first);
     }
 
@@ -142,11 +132,6 @@ class Car
         }
     }
 
-    // void erase_last_position(){
-    //     // road_state->OCCUPIED_POSITIONS[position.second][position.first] = false;
-    //     road_state->setPositionFree(position.second, position.first);
-    // }
-
     void calculate_next_position(Movement_direction dir){
         if(current_delta_y < delta_y_to_do){
             step_y(start_pos);
@@ -187,7 +172,6 @@ class Car
     }
 
     bool isStartPositionOccupied(){
-        // return road_state->OCCUPIED_POSITIONS[position.second][position.first];
         return road_state->getPositionStatus(position.second, position.first);
     }
 
