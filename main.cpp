@@ -8,7 +8,7 @@
 std::mutex mtx;
 bool running = true;
 WINDOW* win;
-RoadState road_state;
+RoadState* road_state;
 
 WINDOW* init_map()
 {
@@ -18,10 +18,10 @@ WINDOW* init_map()
     getmaxyx(stdscr, y_max_size, x_max_size);
     cbreak();
     curs_set(0);
-    WINDOW* win = newwin(road_state.wall+2,
-                        road_state.wall+2,
-                        y_max_size/2-road_state.wall/2,
-                        x_max_size/2-road_state.wall/2);
+    WINDOW* win = newwin(road_state->wall+2,
+                        road_state->wall+2,
+                        y_max_size/2-road_state->wall/2,
+                        x_max_size/2-road_state->wall/2);
     return win;
 }
 
@@ -44,18 +44,18 @@ void draw_map()
 {
     box(win,0,0);
     //horizontal
-    for(int i=0;i<road_state.lanes;++i){
-        for(int j=1;j<road_state.wall+1;++j){
-            mvwprintw(win, road_state.slots+i+1,j , ".");
-            road_state.OCCUPIED_POSITIONS[i][road_state.slots+j+1] = false;
+    for(int i=0;i<road_state->lanes;++i){
+        for(int j=1;j<road_state->wall+1;++j){
+            mvwprintw(win, road_state->slots+i+1,j , ".");
+            road_state->OCCUPIED_POSITIONS[i][road_state->slots+j+1] = false;
         }
     }
 
     //vertical
-    for(int i = 0; i < road_state.lanes;++i){
-        for(int j=1;j < road_state.wall+1;++j){
-            mvwprintw(win, j, road_state.slots+i+1, ".");
-            road_state.OCCUPIED_POSITIONS[road_state.slots+i+1][j] = false;
+    for(int i = 0; i < road_state->lanes;++i){
+        for(int j=1;j < road_state->wall+1;++j){
+            mvwprintw(win, j, road_state->slots+i+1, ".");
+            road_state->OCCUPIED_POSITIONS[road_state->slots+i+1][j] = false;
         }
     }
     wrefresh(win);
@@ -91,13 +91,13 @@ void draw_Car(Car& car, Movement_direction where)
     bool carIsSet = false;
 
     while(!carIsSet){//Setting vehicle on the road
-        mtx.lock();
+        // mtx.lock();
         bool isStartPositionOccupied = car.isStartPositionOccupied();
-        mtx.unlock();
+        // mtx.unlock();
         if(!isStartPositionOccupied){
-            mtx.lock();
+            // mtx.lock();
             car.set_on_junction();
-            mtx.unlock();
+            // mtx.unlock();
             carIsSet = true;
         }
         else{
@@ -108,23 +108,11 @@ void draw_Car(Car& car, Movement_direction where)
     while (!car.getHasArrived())
     {
         std::this_thread::sleep_for(std::chrono::milliseconds(car.getSpeed()));
-        mtx.lock();
-        car.erase_last_position();
-        mtx.unlock();
-
-        car.calculate_next_position(where);
-        
-        while (car.road_state.OCCUPIED_POSITIONS[car.position.second][car.position.first])
-        {
-            std::this_thread::sleep_for(std::chrono::milliseconds(500));
-        }
-        mtx.lock();
-        car.move();
-        mtx.unlock();
+        car.move(where);
     }
-    mtx.lock();
+    // mtx.lock();
     car.~Car();
-    mtx.unlock();
+    // mtx.unlock();
 }
 
 int main(int argc, char* argv[])
@@ -136,15 +124,15 @@ int main(int argc, char* argv[])
 
     std::vector<Car> cars;
     std::vector<std::thread> carThreads;
-    road_state = RoadState(atoi(argv[1]), atoi(argv[2]));
+    road_state = new RoadState(atoi(argv[1]), atoi(argv[2]));
 
     win = init_map();
 
-    cars.push_back(Car(win, road_state, LEFT, "A"));
-    cars.push_back(Car(win, road_state, LEFT, "E"));
-    cars.push_back(Car(win, road_state, TOP, "B"));
-    cars.push_back(Car(win, road_state, RIGHT, "C"));
-    cars.push_back(Car(win, road_state, RIGHT, "D"));
+    cars.push_back(Car(win, road_state, LEFT, (char*)"A"));
+    cars.push_back(Car(win, road_state, LEFT, (char*)"E"));
+    cars.push_back(Car(win, road_state, TOP, (char*)"B"));
+    cars.push_back(Car(win, road_state, RIGHT, (char*)"C"));
+    cars.push_back(Car(win, road_state, RIGHT, (char*)"D"));
 
     std::thread input([](){read_input();});
 

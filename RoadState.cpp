@@ -2,11 +2,14 @@
 #include <vector>
 #include <atomic>
 #include <iostream>
+#include <mutex>
 
-struct RoadState {
+class RoadState {
+    public:
     int slots;
     int lanes;
     int wall;
+    std::mutex mtx;
     std::tuple<int, int> start_positions[4];// top, right, bot, left;//tuple contains start start_positions on roads (y,x)
     std::tuple<int, int> end_positions[4];//top, right, bot, left
     std::atomic<bool>** OCCUPIED_POSITIONS;
@@ -31,5 +34,28 @@ struct RoadState {
         for(int i = 0; i < wall +2; ++i){
             this->OCCUPIED_POSITIONS[i] = new std::atomic<bool> [wall + 2];
         }
+    }
+
+    void setPositionOccupied(int y, int x)
+    {
+        mtx.lock();
+        OCCUPIED_POSITIONS[y][x] = true;
+        mtx.unlock();
+    }
+
+    void setPositionFree(int y, int x)
+    {
+        mtx.lock();
+        OCCUPIED_POSITIONS[y][x] = false;
+        mtx.unlock();
+    }
+
+    bool getPositionStatus(int y, int x)
+    {
+        bool status;
+        mtx.lock();
+        status = OCCUPIED_POSITIONS[y][x];
+        mtx.unlock();
+        return status;
     }
 };

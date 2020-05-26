@@ -10,9 +10,11 @@ class Car : public Vehicle
         int delta_x_to_do = 0;
         int current_delta_y = 0;
         int current_delta_x = 0;
-
     public:
-    Car(WINDOW* win, RoadState& road_state, Road_Pos start, char* sym)
+        RoadState* road_state;
+
+    // public:
+    Car(WINDOW* win, RoadState* road_state, Road_Pos start, char* sym)
     {
         this->road_state = road_state;
         this->win = win;
@@ -24,19 +26,19 @@ class Car : public Vehicle
         switch(this->start_pos){
             case 0://top
                 position.first = 1;
-                position.second = road_state.slots+1;
+                position.second = road_state->slots+1;
                 break;
             case 2://bot
-                position.first = 2*road_state.slots + road_state.lanes;
-                position.second = road_state.slots+road_state.lanes;
+                position.first = 2*road_state->slots + road_state->lanes;
+                position.second = road_state->slots+road_state->lanes;
                 break;
             case 3://left
-                position.first = road_state.slots + road_state.lanes;
+                position.first = road_state->slots + road_state->lanes;
                 position.second = 1;
                 break;
             case 1://right
-                position.first = road_state.slots+1;
-                position.second = 2*road_state.slots + road_state.lanes;
+                position.first = road_state->slots+1;
+                position.second = 2*road_state->slots + road_state->lanes;
                 break;
         }
     }
@@ -44,27 +46,29 @@ class Car : public Vehicle
     ~Car(){
         // mvwprintw(win, position.first, position.second, ".");
         // wrefresh(win);
-        road_state.OCCUPIED_POSITIONS[position.second][position.first] = false;
+        // road_state->OCCUPIED_POSITIONS[position.second][position.first] = false;
+        road_state->setPositionFree(position.second, position.first);
     }
 
     void set_on_junction()
     {
-        road_state.OCCUPIED_POSITIONS[position.second][position.first] = true;
+        // road_state->OCCUPIED_POSITIONS[position.second][position.first] = true;
+        road_state->setPositionOccupied(position.second, position.first);
     }
 
     void calculate_movement_to_do(Movement_direction dir){
         switch(dir){
             case FORWARD:
-                delta_y_to_do = 2*road_state.slots + road_state.lanes-1;
+                delta_y_to_do = 2*road_state->slots + road_state->lanes-1;
                 delta_x_to_do = 0;
                 break;
             case TURN_RIGHT:
-                delta_y_to_do = road_state.slots;
-                delta_x_to_do = road_state.slots;
+                delta_y_to_do = road_state->slots;
+                delta_x_to_do = road_state->slots;
                 break;
             case TURN_LEFT:
-                delta_y_to_do = road_state.slots + road_state.lanes-1;
-                delta_x_to_do = road_state.slots + road_state.lanes-1;
+                delta_y_to_do = road_state->slots + road_state->lanes-1;
+                delta_x_to_do = road_state->slots + road_state->lanes-1;
                 break;
         }
     }
@@ -123,9 +127,10 @@ class Car : public Vehicle
         }
     }
 
-    void erase_last_position(){
-        road_state.OCCUPIED_POSITIONS[position.second][position.first] = false;
-    }
+    // void erase_last_position(){
+    //     // road_state->OCCUPIED_POSITIONS[position.second][position.first] = false;
+    //     road_state->setPositionFree(position.second, position.first);
+    // }
 
     void calculate_next_position(Movement_direction dir){
         if(current_delta_y < delta_y_to_do){
@@ -145,9 +150,17 @@ class Car : public Vehicle
         }
     }
 
-    void move()
+    void move(Movement_direction dir)
     {
-        road_state.OCCUPIED_POSITIONS[position.second][position.first] = true;
+        road_state->setPositionFree(position.second, position.first);
+        calculate_next_position(dir);
+
+        while (road_state->OCCUPIED_POSITIONS[position.second][position.first])
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        }
+
+        road_state->setPositionOccupied(position.second, position.first);
     }
 
     bool getHasArrived(){
@@ -159,7 +172,8 @@ class Car : public Vehicle
     }
 
     bool isStartPositionOccupied(){
-        return road_state.OCCUPIED_POSITIONS[position.second][position.first];
+        // return road_state->OCCUPIED_POSITIONS[position.second][position.first];
+        return road_state->getPositionStatus(position.second, position.first);
     }
 
     void slowDown(){
