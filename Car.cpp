@@ -1,17 +1,32 @@
 #include <ncurses.h>
 #include <mutex>
 #include <thread>
-#include "Vehicle.cpp"
+#include "RoadState.cpp"
 
-class Car : public Vehicle
+
+enum Road_Pos{
+    TOP, RIGHT, BOT, LEFT
+};
+
+enum Movement_direction{
+    FORWARD, TURN_RIGHT, TURN_LEFT
+};
+
+class Car 
 {
     private:
         int delta_y_to_do = 0;
         int delta_x_to_do = 0;
         int current_delta_y = 0;
         int current_delta_x = 0;
+        WINDOW* win;
+        char* symbol;
+        bool hasArrived;
+        int speed;
     public:
         RoadState* road_state;
+        std::pair<int,int> position;//(y,x)
+        Road_Pos start_pos;
 
     // public:
     Car(WINDOW* win, RoadState* road_state, Road_Pos start, char* sym)
