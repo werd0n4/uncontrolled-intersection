@@ -101,13 +101,13 @@ void draw_Car(Car& car, Movement_direction where)
             carIsSet = true;
         }
         else{
-            std::this_thread::sleep_for(std::chrono::milliseconds(car.getDefaultSpeed()));
+            std::this_thread::sleep_for(std::chrono::milliseconds(car.getSpeed()));
         }
     } 
     //car is driving
     while (!car.getHasArrived())
     {
-        std::this_thread::sleep_for(std::chrono::milliseconds(car.getDefaultSpeed()));
+        std::this_thread::sleep_for(std::chrono::milliseconds(car.getSpeed()));
         mtx.lock();
         car.erase_last_position();
         mtx.unlock();
@@ -139,7 +139,6 @@ int main(int argc, char* argv[])
     road_state = RoadState(atoi(argv[1]), atoi(argv[2]));
 
     win = init_map();
-    // draw_map();
 
     cars.push_back(Car(win, road_state, LEFT, "A"));
     cars.push_back(Car(win, road_state, LEFT, "E"));

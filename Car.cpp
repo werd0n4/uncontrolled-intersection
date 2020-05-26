@@ -154,7 +154,7 @@ class Car : public Vehicle
         return this->hasArrived;
     }
 
-    int getDefaultSpeed(){
+    int getSpeed(){
         return this->speed;
     }
 
