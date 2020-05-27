@@ -7,6 +7,7 @@
 
 std::mutex mtx;
 bool running = true;
+bool isPaused = false;
 WINDOW* win;
 RoadState* road_state;
 
@@ -34,6 +35,9 @@ void read_input()
             case 27://ESC - exit program
                 endwin();
                 quit = true;
+                break;
+            case 'p'://p - pause program
+                isPaused = !isPaused;
                 break;
         }
     }
@@ -99,8 +103,10 @@ void draw_Car(Car& car, Movement_direction where)
     //car is driving
     while (!car.getHasArrived())
     {
-        std::this_thread::sleep_for(std::chrono::milliseconds(car.getSpeed()));
-        car.move(where);
+        while(!isPaused){
+            std::this_thread::sleep_for(std::chrono::milliseconds(car.getSpeed()));
+            car.move(where);
+        }
     }
     car.~Car();
 }
@@ -108,8 +114,10 @@ void draw_Car(Car& car, Movement_direction where)
 int main(int argc, char* argv[])
 {
     if(argc != 3){
-        std::cout << "Niepoprawna liczba argumentow!\nNalezy podac dwa argumenty"<<std::endl;
-        return 0;
+        // std::cout << "Niepoprawna liczba argumentow!\nNalezy podac dwa argumenty"<<std::endl;
+        argv[1] = (char*)"2";
+        argv[2] = (char*)"8";
+        // return 0;
     }
 
     std::vector<Car> cars;
@@ -121,17 +129,19 @@ int main(int argc, char* argv[])
     cars.push_back(Car(win, road_state, LEFT, (char*)"A"));
     cars.push_back(Car(win, road_state, LEFT, (char*)"E"));
     cars.push_back(Car(win, road_state, TOP, (char*)"B"));
+    cars.push_back(Car(win, road_state, TOP, (char*)"F"));
     cars.push_back(Car(win, road_state, RIGHT, (char*)"C"));
     cars.push_back(Car(win, road_state, RIGHT, (char*)"D"));
+    cars.push_back(Car(win, road_state, BOT, (char*)"G"));
+    cars.push_back(Car(win, road_state, BOT, (char*)"H"));
 
     std::thread input([](){read_input();});
+    std::thread screenRefresh([&cars](){refreshScreen(cars);});
 
     for(auto it = cars.begin(); it != cars.end(); ++it)
     {
         carThreads.push_back(std::thread([it](){draw_Car(*it, FORWARD);}));
     }
-
-    std::thread screenRefresh([&cars](){refreshScreen(cars);});
 
     for(auto it = carThreads.begin(); it != carThreads.end(); ++it)
     {
