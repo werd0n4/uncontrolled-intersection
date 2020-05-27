@@ -25,7 +25,7 @@ class Car
         int speed;
     public:
         RoadState* road_state;
-        std::pair<int,int> position;//(y,x)
+        std::pair<int,int> position, newPosition;//(y,x)
         Road_Pos start_pos;
 
     Car(WINDOW* _win, RoadState* _road_state, Road_Pos _start_pos, char* _symbol) : win(_win), road_state(_road_state), 
@@ -56,8 +56,7 @@ class Car
         road_state->setPositionFree(position.second, position.first);
     }
 
-    void set_on_junction()
-    {
+    void set_on_junction(){
         road_state->setPositionOccupied(position.second, position.first);
     }
 

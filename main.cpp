@@ -126,14 +126,14 @@ int main(int argc, char* argv[])
 
     win = init_map();
 
-    cars.push_back(Car(win, road_state, LEFT, (char*)"A"));
-    cars.push_back(Car(win, road_state, LEFT, (char*)"E"));
+    cars.push_back(Car(win, road_state, TOP, (char*)"A"));
     cars.push_back(Car(win, road_state, TOP, (char*)"B"));
-    cars.push_back(Car(win, road_state, TOP, (char*)"F"));
     cars.push_back(Car(win, road_state, RIGHT, (char*)"C"));
     cars.push_back(Car(win, road_state, RIGHT, (char*)"D"));
-    cars.push_back(Car(win, road_state, BOT, (char*)"G"));
-    cars.push_back(Car(win, road_state, BOT, (char*)"H"));
+    cars.push_back(Car(win, road_state, BOT, (char*)"E"));
+    cars.push_back(Car(win, road_state, BOT, (char*)"F"));
+    cars.push_back(Car(win, road_state, LEFT, (char*)"G"));
+    cars.push_back(Car(win, road_state, LEFT, (char*)"H"));
 
     std::thread input([](){read_input();});
     std::thread screenRefresh([&cars](){refreshScreen(cars);});
