@@ -50,6 +50,7 @@ class Car
                 position.second = 2*road_state->slots + road_state->lanes;
                 break;
         }
+        newPosition = position;
     }
 
     ~Car(){
@@ -82,16 +83,16 @@ class Car
         switch (start_pos)
         {
         case RIGHT:
-            position.second--;
+            newPosition.second--;
             break;
         case LEFT:
-            position.second++;
+            newPosition.second++;
             break;
         case TOP:
-            position.first++;
+            newPosition.first++;
             break;
         case BOT:
-            position.first--;
+            newPosition.first--;
         }
     }
 
@@ -99,16 +100,16 @@ class Car
         switch (start_pos)
         {
         case RIGHT:
-            position.first--;
+            newPosition.first--;
             break;
         case LEFT:
-            position.first++;
+            newPosition.first++;
             break;
         case TOP:
-            position.second--;
+            newPosition.second--;
             break;
         case BOT:
-            position.second++;
+            newPosition.second++;
             break;
         }
     }
@@ -117,16 +118,16 @@ class Car
         switch (start_pos)
         {
         case RIGHT:
-            position.first++;
+            newPosition.first++;
             break;
         case LEFT:
-            position.first--;
+            newPosition.first--;
             break;
         case TOP:
-            position.second++;
+            newPosition.second++;
             break;
         case BOT:
-            position.second--;
+            newPosition.second--;
             break;
         }
     }
@@ -151,15 +152,21 @@ class Car
 
     void move(Movement_direction dir)
     {
-        road_state->setPositionFree(position.second, position.first);
+        bool moveFinished = false;
+
         calculate_next_position(dir);
-
-        while (road_state->OCCUPIED_POSITIONS[position.second][position.first])
-        {
-            std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        while(!moveFinished){
+            if(road_state->getPositionStatus(newPosition.second, newPosition.first) == false){//check if position is already occupied
+                //position is free
+                road_state->setPositionFree(position.second, position.first);
+                position = newPosition;
+                road_state->setPositionOccupied(position.second, position.first);
+                moveFinished = true;
+            }
+            else{
+                std::this_thread::sleep_for(std::chrono::milliseconds(speed+100));
+            }
         }
-
-        road_state->setPositionOccupied(position.second, position.first);
     }
 
     bool getHasArrived(){

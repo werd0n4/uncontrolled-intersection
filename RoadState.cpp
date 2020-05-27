@@ -9,10 +9,13 @@ class RoadState {
     int slots;
     int lanes;
     int wall;
-    std::mutex mtx;
+    std::mutex mtx1;
+    std::mutex mtx2;
+    std::mutex mtx3;
     std::tuple<int, int> start_positions[4];// top, right, bot, left;//tuple contains start start_positions on roads (y,x)
     std::tuple<int, int> end_positions[4];//top, right, bot, left
-    std::atomic<bool>** OCCUPIED_POSITIONS;
+    std::vector<std::vector<bool>> OCCUPIED_POSITIONS;
+
 
     RoadState(): slots(0), lanes(0), wall(0){ }
 
@@ -30,32 +33,35 @@ class RoadState {
         start_positions[1] = std::make_tuple(slots + 1, 2*slots + lanes);//right
         end_positions[1] = std::make_tuple(slots + 2, 2*slots + lanes);
 
-        this->OCCUPIED_POSITIONS = new std::atomic<bool>* [wall + 2];
-        for(int i = 0; i < wall +2; ++i){
-            this->OCCUPIED_POSITIONS[i] = new std::atomic<bool> [wall + 2];
+        for(int i=0;i<wall+2;++i){
+            std::vector<bool> temp;
+            for(int j=0;j<wall+2;++j){
+                temp.push_back(false);
+            }
+            OCCUPIED_POSITIONS.push_back(temp);
         }
     }
 
     void setPositionOccupied(int y, int x)
     {
-        mtx.lock();
+        mtx1.lock();
         OCCUPIED_POSITIONS[y][x] = true;
-        mtx.unlock();
+        mtx1.unlock();
     }
 
     void setPositionFree(int y, int x)
     {
-        mtx.lock();
+        mtx2.lock();
         OCCUPIED_POSITIONS[y][x] = false;
-        mtx.unlock();
+        mtx2.unlock();
     }
 
     bool getPositionStatus(int y, int x)
     {
         bool status;
-        mtx.lock();
+        mtx3.lock();
         status = OCCUPIED_POSITIONS[y][x];
-        mtx.unlock();
+        mtx3.unlock();
         return status;
     }
 };
