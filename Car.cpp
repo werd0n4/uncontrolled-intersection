@@ -160,7 +160,7 @@ class Car
             return;
         }
         while(!moveFinished){
-            if(road_state->getPositionStatus(newPosition.second, newPosition.first) == false && !road_state->checkRightSide(position, newPosition)){//check if position is already occupied
+            if(road_state->getPositionStatus(newPosition.second, newPosition.first) == false && !checkRightSide(position, newPosition)){//check if position is already occupied
                 //position is free
                 road_state->setPositionOccupied(newPosition.second, newPosition.first);
                 road_state->setPositionFree(position.second, position.first);
@@ -169,6 +169,26 @@ class Car
             }
             else{
                 std::this_thread::sleep_for(std::chrono::milliseconds(speed));
+            }
+        }
+    }
+
+    //return true if there is a car to the right of the newPosition
+    bool checkRightSide(std::pair<int, int> position, std::pair<int, int> newPosition){
+        if(position.second - newPosition.second == 0){
+            if(position.first - newPosition.first > 0){
+                return road_state->getPositionStatus(newPosition.second-1, newPosition.first);
+            }
+            else{
+                return road_state->getPositionStatus(newPosition.second+1, newPosition.first);
+            }
+        }
+        else{
+            if(position.second - newPosition.second > 0){
+                return road_state->getPositionStatus(newPosition.second, newPosition.first+1);
+            }
+            else{
+                return road_state->getPositionStatus(newPosition.second, newPosition.first-1);
             }
         }
     }

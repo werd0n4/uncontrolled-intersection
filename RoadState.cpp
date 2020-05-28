@@ -64,23 +64,4 @@ class RoadState {
         mtx3.unlock();
         return status;
     }
-
-    bool checkRightSide(std::pair<int, int> position, std::pair<int, int> newPosition){
-        if(position.second - newPosition.second == 0){
-            if(position.first - newPosition.first > 0){
-                return getPositionStatus(newPosition.second-1, newPosition.first);
-            }
-            else{
-                return getPositionStatus(newPosition.second+1, newPosition.first);
-            }
-        }
-        else{
-            if(position.second - newPosition.second > 0){
-                return getPositionStatus(newPosition.second, newPosition.first+1);
-            }
-            else{
-                return getPositionStatus(newPosition.second, newPosition.first-1);
-            }
-        }
-    }
 };
