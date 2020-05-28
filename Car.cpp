@@ -4,13 +4,7 @@
 #include "RoadState.cpp"
 
 
-enum Road_Pos{
-    TOP, RIGHT, BOT, LEFT
-};
 
-enum Movement_direction{
-    FORWARD, TURN_RIGHT, TURN_LEFT
-};
 
 class Car 
 {
@@ -160,7 +154,7 @@ class Car
             return;
         }
         while(!moveFinished){
-            if(road_state->getPositionStatus(newPosition.second, newPosition.first) == false && !checkRightSide(position, newPosition)){//check if position is already occupied
+            if(road_state->getPositionStatus(newPosition.second, newPosition.first) == false && checkIfYouCanPassCrossing(position, newPosition)){//check if position is already occupied
                 //position is free
                 road_state->setPositionOccupied(newPosition.second, newPosition.first);
                 road_state->setPositionFree(position.second, position.first);
@@ -173,22 +167,48 @@ class Car
         }
     }
 
+    //return true if there is a car on your path on crossing
+    bool checkIfYouCanPassCrossing(std::pair<int, int> position, std::pair<int, int> newPosition){
+        if(position == road_state->getStopLine(start_pos)){
+            return !checkRightSide(position, newPosition);
+        }
+        else{
+            return true;
+        }
+    }
+
     //return true if there is a car to the right of the newPosition
     bool checkRightSide(std::pair<int, int> position, std::pair<int, int> newPosition){
         if(position.first - newPosition.first != 0){//car is entering in vertical line
             if(position.first - newPosition.first > 0){//car is entering from bot to top
-                return road_state->getPositionStatus(position.second+1, position.first-2);
+                return road_state->getPositionStatus(position.second+1, position.first-2)//default case to check
+                    || road_state->getPositionStatus(position.second+1, position.first-1)
+                    || road_state->getPositionStatus(position.second+1, position.first)
+                    || road_state->getPositionStatus(position.second+2, position.first-2)
+                    || road_state->getPositionStatus(position.second, position.first-2);
             }
             else{//car is moving from top to bot
-                return road_state->getPositionStatus(position.second-1, position.first+2);
+                return road_state->getPositionStatus(position.second-1, position.first+2)//default case to check
+                    || road_state->getPositionStatus(position.second-1, position.first+1)
+                    || road_state->getPositionStatus(position.second-1, position.first)
+                    || road_state->getPositionStatus(position.second-2, position.first+2)
+                    || road_state->getPositionStatus(position.second, position.first+2);
             }
         }
         else{//car is entering in horizontal line 
             if(position.second - newPosition.second < 0){//car is entering from left to right
-                return road_state->getPositionStatus(position.second+2, position.first+1);
+                return road_state->getPositionStatus(position.second+2, position.first+1)//default case to check
+                    || road_state->getPositionStatus(position.second+1, position.first+1)
+                    || road_state->getPositionStatus(position.second, position.first+1)
+                    || road_state->getPositionStatus(position.second+2, position.first+2)
+                    || road_state->getPositionStatus(position.second+2, position.first);
             }
             else{//car is entering from right to left
-                return road_state->getPositionStatus(position.second-2, position.first-1);
+                return road_state->getPositionStatus(position.second-2, position.first-1)//default case to check
+                    || road_state->getPositionStatus(position.second-1, position.first-1)
+                    || road_state->getPositionStatus(position.second, position.first-1)
+                    || road_state->getPositionStatus(position.second-2, position.first-2)
+                    || road_state->getPositionStatus(position.second-2, position.first);
             }
         }
     }

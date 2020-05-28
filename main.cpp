@@ -131,11 +131,11 @@ int main(int argc, char* argv[])
     cars.push_back(Car(win, road_state, TOP, (char*)"B"));
     cars.push_back(Car(win, road_state, RIGHT, (char*)"C"));
     cars.push_back(Car(win, road_state, RIGHT, (char*)"D"));
-    // cars.push_back(Car(win, road_state, RIGHT, (char*)"X"));
+    cars.push_back(Car(win, road_state, RIGHT, (char*)"X"));
     cars.push_back(Car(win, road_state, BOT, (char*)"E"));
     cars.push_back(Car(win, road_state, BOT, (char*)"F"));
-    cars.push_back(Car(win, road_state, LEFT, (char*)"G"));
-    cars.push_back(Car(win, road_state, LEFT, (char*)"H"));
+    // cars.push_back(Car(win, road_state, LEFT, (char*)"G"));
+    // cars.push_back(Car(win, road_state, LEFT, (char*)"H"));
 
     std::thread input([](){read_input();});
     std::thread screenRefresh([&cars](){refreshScreen(cars);});

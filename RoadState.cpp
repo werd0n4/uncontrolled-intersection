@@ -4,6 +4,14 @@
 #include <iostream>
 #include <mutex>
 
+enum Road_Pos{
+    TOP, RIGHT, BOT, LEFT
+};
+
+enum Movement_direction{
+    FORWARD, TURN_RIGHT, TURN_LEFT
+};
+
 class RoadState {
     public:
     int slots;
@@ -14,6 +22,7 @@ class RoadState {
     std::mutex mtx3;
     std::tuple<int, int> start_positions[4];// top, right, bot, left;//tuple contains start start_positions on roads (y,x)
     std::tuple<int, int> end_positions[4];//top, right, bot, left
+    std::pair<int, int> stop_line_position[4];//top, right, bot, left
     std::vector<std::vector<bool>> OCCUPIED_POSITIONS;
 
 
@@ -23,15 +32,19 @@ class RoadState {
     {   
         start_positions[0] = std::make_tuple(1, slots + 1);//top
         end_positions[0] = std::make_tuple(1, slots + 2);
+        stop_line_position[0] = std::make_pair(slots, slots+1);
 
         start_positions[2] = std::make_tuple(2*slots + lanes, slots+lanes);//bot
         end_positions[2] = std::make_tuple(2*slots + lanes, slots + lanes - 1);
+        stop_line_position[2] = std::make_pair(slots+lanes+1, slots+2);
         
         start_positions[3] = std::make_tuple(slots + lanes, 1);//left
         end_positions[3] = std::make_tuple(slots + lanes - 1, 1);
+        stop_line_position[3] = std::make_pair(slots+lanes, slots);
 
         start_positions[1] = std::make_tuple(slots + 1, 2*slots + lanes);//right
         end_positions[1] = std::make_tuple(slots + 2, 2*slots + lanes);
+        stop_line_position[1] = std::make_pair(slots+1, slots+lanes+1);
 
         for(int i=0;i<wall+2;++i){
             std::vector<bool> temp;
@@ -40,6 +53,10 @@ class RoadState {
             }
             OCCUPIED_POSITIONS.push_back(temp);
         }
+    }
+
+    std::pair<int, int> getStopLine(Road_Pos dir){
+        return stop_line_position[dir];
     }
 
     void setPositionOccupied(int y, int x)
