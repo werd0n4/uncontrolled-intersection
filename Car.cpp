@@ -175,20 +175,20 @@ class Car
 
     //return true if there is a car to the right of the newPosition
     bool checkRightSide(std::pair<int, int> position, std::pair<int, int> newPosition){
-        if(position.second - newPosition.second == 0){
-            if(position.first - newPosition.first > 0){
-                return road_state->getPositionStatus(newPosition.second-1, newPosition.first);
+        if(position.first - newPosition.first != 0){//car is entering in vertical line
+            if(position.first - newPosition.first > 0){//car is entering from bot to top
+                return road_state->getPositionStatus(position.second+1, position.first-2);
             }
-            else{
-                return road_state->getPositionStatus(newPosition.second+1, newPosition.first);
+            else{//car is moving from top to bot
+                return road_state->getPositionStatus(position.second-1, position.first+2);
             }
         }
-        else{
-            if(position.second - newPosition.second > 0){
-                return road_state->getPositionStatus(newPosition.second, newPosition.first+1);
+        else{//car is entering in horizontal line 
+            if(position.second - newPosition.second < 0){//car is entering from left to right
+                return road_state->getPositionStatus(position.second+2, position.first+1);
             }
-            else{
-                return road_state->getPositionStatus(newPosition.second, newPosition.first-1);
+            else{//car is entering from right to left
+                return road_state->getPositionStatus(position.second-2, position.first-1);
             }
         }
     }
