@@ -46,20 +46,21 @@ void read_input()
 
 void draw_map()
 {
+    clear();
     box(win,0,0);
     //horizontal
     for(int i=0;i<road_state->lanes;++i){
         for(int j=1;j<road_state->wall+1;++j){
             mvwprintw(win, road_state->slots+i+1,j , ".");
-           // road_state->OCCUPIED_POSITIONS[i][road_state->slots+j+1] = false;
+        //  road_state->OCCUPIED_POSITIONS[i][road_state->slots+j+1] = false;
         }
     }
 
     //vertical
     for(int i = 0; i < road_state->lanes;++i){
         for(int j=1;j < road_state->wall+1;++j){
-            mvwprintw(win, j, road_state->slots+i+1, ".");
-          //  road_state->OCCUPIED_POSITIONS[road_state->slots+i+1][j] = false;
+           mvwprintw(win, j, road_state->slots+i+1, ".");
+//           road_state->OCCUPIED_POSITIONS[road_state->slots+i+1][j] = false;
         }
     }
     wrefresh(win);
@@ -108,7 +109,7 @@ void draw_Car(Car& car, Movement_direction where)
             car.move(where);
         }
     }
-    car.~Car();
+    // car.~Car();
 }
 
 int main(int argc, char* argv[])
@@ -126,14 +127,15 @@ int main(int argc, char* argv[])
 
     win = init_map();
 
-    cars.push_back(Car(win, road_state, TOP, (char*)"A"));
-    cars.push_back(Car(win, road_state, TOP, (char*)"B"));
+    // cars.push_back(Car(win, road_state, TOP, (char*)"A"));
+    // cars.push_back(Car(win, road_state, TOP, (char*)"B"));
     cars.push_back(Car(win, road_state, RIGHT, (char*)"C"));
     cars.push_back(Car(win, road_state, RIGHT, (char*)"D"));
+    cars.push_back(Car(win, road_state, RIGHT, (char*)"X"));
     cars.push_back(Car(win, road_state, BOT, (char*)"E"));
     cars.push_back(Car(win, road_state, BOT, (char*)"F"));
-    cars.push_back(Car(win, road_state, LEFT, (char*)"G"));
-    cars.push_back(Car(win, road_state, LEFT, (char*)"H"));
+    // cars.push_back(Car(win, road_state, LEFT, (char*)"G"));
+    // cars.push_back(Car(win, road_state, LEFT, (char*)"H"));
 
     std::thread input([](){read_input();});
     std::thread screenRefresh([&cars](){refreshScreen(cars);});

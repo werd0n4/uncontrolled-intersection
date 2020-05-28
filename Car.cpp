@@ -155,16 +155,20 @@ class Car
         bool moveFinished = false;
 
         calculate_next_position(dir);
+        if(hasArrived){
+            road_state->setPositionFree(position.second, position.first);
+            return;
+        }
         while(!moveFinished){
-            if(road_state->getPositionStatus(newPosition.second, newPosition.first) == false){//check if position is already occupied
+            if(road_state->getPositionStatus(newPosition.second, newPosition.first) == false && !road_state->checkRightSide(position, newPosition)){//check if position is already occupied
                 //position is free
+                road_state->setPositionOccupied(newPosition.second, newPosition.first);
                 road_state->setPositionFree(position.second, position.first);
                 position = newPosition;
-                road_state->setPositionOccupied(position.second, position.first);
                 moveFinished = true;
             }
             else{
-                std::this_thread::sleep_for(std::chrono::milliseconds(speed+100));
+                std::this_thread::sleep_for(std::chrono::milliseconds(speed));
             }
         }
     }
