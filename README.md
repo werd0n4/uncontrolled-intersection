@@ -21,9 +21,10 @@ Inside container we run program as in regular terminal
 ```
 
 As a parameter the user gives the number of cars that are to cross the intersection.
+
 Each car has a color which indicates its destination:
 
-Green - TOP
-Red - RIGHT
-Light blue - BOT
-Orange - LEFT
+- Green - TOP
+- Red - RIGHT
+- Light blue - BOT
+- Orange - LEFT
