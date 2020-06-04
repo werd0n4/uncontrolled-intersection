@@ -23,8 +23,15 @@ Inside container we run program as in regular terminal
 As a parameter the user gives the number of cars that are to cross the intersection.
 
 Each car has a color which indicates its destination:
-
 - Green - TOP
 - Red - RIGHT
 - Light blue - BOT
 - Orange - LEFT
+
+Shortcuts:
+- ESC - exit program
+- P - pause program
+
+Example execution:
+
+<img src="https://github.com/werd0n4/TrafficLights/blob/master/example.png">
