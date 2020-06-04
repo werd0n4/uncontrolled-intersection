@@ -146,7 +146,7 @@ int main(int argc, char* argv[])
 
     std::vector<Car> cars;
     std::vector<std::thread> carThreads;
-    road_state = new RoadState(2,8);
+    road_state = new RoadState(2,10);
 
     win = init_map();
 
