@@ -14,7 +14,7 @@ class Car
         int current_delta_y = 0;
         int current_delta_x = 0;
         WINDOW* win;
-        char* symbol;
+        const char* symbol;
         bool hasArrived;
         int speed;
     public:
@@ -22,7 +22,7 @@ class Car
         std::pair<int,int> position, newPosition;//(y,x)
         Road_Pos start_pos;
 
-    Car(WINDOW* _win, RoadState* _road_state, Road_Pos _start_pos, char* _symbol) : win(_win), road_state(_road_state), 
+    Car(WINDOW* _win, RoadState* _road_state, Road_Pos _start_pos, const char* _symbol) : win(_win), road_state(_road_state), 
                                                                                     symbol(_symbol), start_pos(_start_pos),
                                                                                     hasArrived(false), speed(500)
     {
@@ -232,7 +232,7 @@ class Car
             this->speed += 100;
     }
 
-    char* getSymbol(){
+    const char* getSymbol(){
         return symbol;
     }
 
