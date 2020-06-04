@@ -20,6 +20,7 @@ class RoadState {
     std::mutex mtx1;
     std::mutex mtx2;
     std::mutex mtx3;
+    std::mutex mtx4;
     std::tuple<int, int> start_positions[4];// top, right, bot, left;//tuple contains start start_positions on roads (y,x)
     std::tuple<int, int> end_positions[4];//top, right, bot, left
     std::pair<int, int> stop_line_position[4];//top, right, bot, left
@@ -73,6 +74,7 @@ class RoadState {
         mtx2.unlock();
     }
 
+    // return true if position is occupied
     bool getPositionStatus(int y, int x)
     {
         bool status;
@@ -80,5 +82,17 @@ class RoadState {
         status = OCCUPIED_POSITIONS[y][x];
         mtx3.unlock();
         return status;
+    }
+
+    // return if every stop line position is occupied, if so then first car that notice it should drive
+    bool checkIfCrossingIsBlocked()
+    {
+        mtx4.lock();
+        bool result = getPositionStatus(stop_line_position[0].second, stop_line_position[0].first) &&
+                    getPositionStatus(stop_line_position[1].second, stop_line_position[1].first) &&
+                    getPositionStatus(stop_line_position[2].second, stop_line_position[2].first) &&
+                    getPositionStatus(stop_line_position[3].second, stop_line_position[3].first);
+        mtx4.unlock();
+        return result;
     }
 };

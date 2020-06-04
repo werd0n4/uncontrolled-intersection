@@ -9,6 +9,7 @@ std::mutex mtx;
 bool running = true;
 bool isPaused = false;
 WINDOW* win;
+WINDOW* outside;
 RoadState* road_state;
 
 WINDOW* init_map()
@@ -23,6 +24,7 @@ WINDOW* init_map()
                         road_state->wall+2,
                         y_max_size/2-road_state->wall/2,
                         x_max_size/2-road_state->wall/2);
+
     return win;
 }
 
@@ -34,6 +36,10 @@ void read_input()
         switch(std::cin.get()){
             case 27://ESC - exit program
                 endwin();
+                std::cout << "Uncontrolled intersection simulator v1.0" << std::endl;
+                std::cout << "Filip Gajewski i Tymoteusz Frankiewicz 2020" << std::endl;
+                std::cout << std::endl;
+                std::cout << "Drive save and focus on the road :D" << std::endl;
                 quit = true;
                 break;
             case 'p'://p - pause program
@@ -48,6 +54,7 @@ void draw_map()
 {
     clear();
     box(win,0,0);
+
     //horizontal
     for(int i=0;i<road_state->lanes;++i){
         for(int j=1;j<road_state->wall+1;++j){
@@ -114,19 +121,20 @@ void draw_Car(Car& car, Movement_direction where)
 
 int main(int argc, char* argv[])
 {
-    if(argc != 3){
-        // std::cout << "Niepoprawna liczba argumentow!\nNalezy podac dwa argumenty"<<std::endl;
-        argv[1] = (char*)"2";
-        argv[2] = (char*)"8";
-        // return 0;
-    }
+    // if(argc != 3){
+    //     // std::cout << "Niepoprawna liczba argumentow!\nNalezy podac dwa argumenty"<<std::endl;
+    //     argv[1] = (char*)"2";
+    //     argv[2] = (char*)"8";
+    //     // return 0;
+    // }
 
     std::vector<Car> cars;
     std::vector<std::thread> carThreads;
-    road_state = new RoadState(atoi(argv[1]), atoi(argv[2]));
+    // road_state = new RoadState(atoi(argv[1]), atoi(argv[2]));
+    road_state = new RoadState(2,8);
 
     win = init_map();
-
+    //test data
     cars.push_back(Car(win, road_state, TOP, (char*)"A"));
     cars.push_back(Car(win, road_state, TOP, (char*)"B"));
     cars.push_back(Car(win, road_state, RIGHT, (char*)"C"));
@@ -134,8 +142,8 @@ int main(int argc, char* argv[])
     cars.push_back(Car(win, road_state, RIGHT, (char*)"X"));
     cars.push_back(Car(win, road_state, BOT, (char*)"E"));
     cars.push_back(Car(win, road_state, BOT, (char*)"F"));
-    // cars.push_back(Car(win, road_state, LEFT, (char*)"G"));
-    // cars.push_back(Car(win, road_state, LEFT, (char*)"H"));
+    cars.push_back(Car(win, road_state, LEFT, (char*)"G"));
+    cars.push_back(Car(win, road_state, LEFT, (char*)"H"));
 
     std::thread input([](){read_input();});
     std::thread screenRefresh([&cars](){refreshScreen(cars);});
@@ -151,6 +159,7 @@ int main(int argc, char* argv[])
     }
     screenRefresh.join();
     input.join();
+
 
     return 0;
 }

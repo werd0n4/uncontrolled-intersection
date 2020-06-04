@@ -154,7 +154,9 @@ class Car
             return;
         }
         while(!moveFinished){
-            if(road_state->getPositionStatus(newPosition.second, newPosition.first) == false && checkIfYouCanPassCrossing(position, newPosition)){//check if position is already occupied
+            if((road_state->getPositionStatus(newPosition.second, newPosition.first) == false && checkIfYouCanPassCrossing(position, newPosition)) || 
+                (road_state->checkIfCrossingIsBlocked() && start_pos == BOT)){//check if position is already occupied or crossing is blocked
+
                 //position is free
                 road_state->setPositionOccupied(newPosition.second, newPosition.first);
                 road_state->setPositionFree(position.second, position.first);
@@ -184,15 +186,15 @@ class Car
                 return road_state->getPositionStatus(position.second+1, position.first-2)//default case to check
                     || road_state->getPositionStatus(position.second+1, position.first-1)
                     || road_state->getPositionStatus(position.second+1, position.first)
-                    || road_state->getPositionStatus(position.second+2, position.first-2)
-                    || road_state->getPositionStatus(position.second, position.first-2);
+                    || road_state->getPositionStatus(position.second+2, position.first-2);
+                    // || road_state->getPositionStatus(position.second, position.first-2);
             }
             else{//car is moving from top to bot
                 return road_state->getPositionStatus(position.second-1, position.first+2)//default case to check
                     || road_state->getPositionStatus(position.second-1, position.first+1)
                     || road_state->getPositionStatus(position.second-1, position.first)
-                    || road_state->getPositionStatus(position.second-2, position.first+2)
-                    || road_state->getPositionStatus(position.second, position.first+2);
+                    || road_state->getPositionStatus(position.second-2, position.first+2);
+                    // || road_state->getPositionStatus(position.second, position.first+2);
             }
         }
         else{//car is entering in horizontal line 
@@ -200,15 +202,15 @@ class Car
                 return road_state->getPositionStatus(position.second+2, position.first+1)//default case to check
                     || road_state->getPositionStatus(position.second+1, position.first+1)
                     || road_state->getPositionStatus(position.second, position.first+1)
-                    || road_state->getPositionStatus(position.second+2, position.first+2)
-                    || road_state->getPositionStatus(position.second+2, position.first);
+                    || road_state->getPositionStatus(position.second+2, position.first+2);
+                    // || road_state->getPositionStatus(position.second+2, position.first);
             }
             else{//car is entering from right to left
                 return road_state->getPositionStatus(position.second-2, position.first-1)//default case to check
                     || road_state->getPositionStatus(position.second-1, position.first-1)
                     || road_state->getPositionStatus(position.second, position.first-1)
-                    || road_state->getPositionStatus(position.second-2, position.first-2)
-                    || road_state->getPositionStatus(position.second-2, position.first);
+                    || road_state->getPositionStatus(position.second-2, position.first-2);
+                    // || road_state->getPositionStatus(position.second-2, position.first);
             }
         }
     }
