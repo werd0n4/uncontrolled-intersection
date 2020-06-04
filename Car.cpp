@@ -21,9 +21,10 @@ class Car
         RoadState* road_state;
         std::pair<int,int> position, newPosition;//(y,x)
         Road_Pos start_pos;
+        Movement_direction dir;
 
-    Car(WINDOW* _win, RoadState* _road_state, Road_Pos _start_pos, const char* _symbol) : win(_win), road_state(_road_state), 
-                                                                                    symbol(_symbol), start_pos(_start_pos),
+    Car(WINDOW* _win, RoadState* _road_state, Road_Pos _start_pos, Movement_direction _dir, const char* _symbol) : win(_win), road_state(_road_state), 
+                                                                                    dir(_dir), symbol(_symbol), start_pos(_start_pos),
                                                                                     hasArrived(false), speed(500)
     {
         switch(this->start_pos){
@@ -55,7 +56,7 @@ class Car
         road_state->setPositionOccupied(position.second, position.first);
     }
 
-    void calculate_movement_to_do(Movement_direction dir){
+    void calculate_movement_to_do(){
         switch(dir){
             case FORWARD:
                 delta_y_to_do = 2*road_state->slots + road_state->lanes-1;
@@ -126,7 +127,7 @@ class Car
         }
     }
 
-    void calculate_next_position(Movement_direction dir){
+    void calculate_next_position(){
         if(current_delta_y < delta_y_to_do){
             step_y(start_pos);
             ++current_delta_y;
@@ -144,11 +145,11 @@ class Car
         }
     }
 
-    void move(Movement_direction dir)
+    void move()
     {
         bool moveFinished = false;
 
-        calculate_next_position(dir);
+        calculate_next_position();
         if(hasArrived){
             road_state->setPositionFree(position.second, position.first);
             return;

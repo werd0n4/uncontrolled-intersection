@@ -27,6 +27,11 @@ WINDOW* init_map()
                         y_max_size/2-road_state->wall/2,
                         x_max_size/2-road_state->wall/2);
 
+    start_color();
+    init_pair(1, COLOR_GREEN, COLOR_BLACK);// Forward
+    init_pair(2, COLOR_RED, COLOR_BLACK);// Right
+    init_pair(3, COLOR_CYAN, COLOR_BLACK);// Left
+
     return win;
 }
 
@@ -84,7 +89,9 @@ void refreshScreen(std::vector<Car>& cars)
             //rysowanie aut
             position = (*it).getPosition();
             if(!(*it).getHasArrived()){
+                wattron(win,COLOR_PAIR((*it).dir+1));
                 mvwprintw(win, position.first, position.second, (*it).getSymbol());
+                wattroff(win,COLOR_PAIR((*it).dir+1));
             }
             wrefresh(win);
         }
@@ -93,9 +100,9 @@ void refreshScreen(std::vector<Car>& cars)
     }
 }
 
-void draw_Car(Car& car, Movement_direction where)
+void draw_Car(Car& car)
 {
-    car.calculate_movement_to_do(where);
+    car.calculate_movement_to_do();
     bool carIsSet = false;
 
     while(!carIsSet){//Setting vehicle on the road
@@ -113,7 +120,7 @@ void draw_Car(Car& car, Movement_direction where)
     {
         while(!isPaused){
             std::this_thread::sleep_for(std::chrono::milliseconds(car.getSpeed()));
-            car.move(where);
+            car.move();
         }
     }
     // car.~Car();
@@ -123,6 +130,9 @@ int main(int argc, char* argv[])
 {
     srand (time(NULL));
     int carNumber = atoi(argv[1]);
+    carNumber = carNumber%26;
+    if(carNumber == 0)
+        carNumber = 1;
     char c[26][2] = {"A", "B", "C", "D", "E",
                      "F", "G", "H", "I", "J",
                      "K", "L", "M", "N", "O",
@@ -137,7 +147,7 @@ int main(int argc, char* argv[])
     win = init_map();
 
     for(int i = 0; i < carNumber; ++i){
-        cars.push_back(Car(win, road_state, Road_Pos(rand()%4), c[i]));
+        cars.push_back(Car(win, road_state, Road_Pos(rand()%4), Movement_direction(rand()%3), c[i]));
     }
 
     std::thread input([](){read_input();});
@@ -145,7 +155,7 @@ int main(int argc, char* argv[])
 
     for(auto it = cars.begin(); it != cars.end(); ++it)
     {
-        carThreads.push_back(std::thread([it](){draw_Car(*it, Movement_direction(rand()%3));}));
+        carThreads.push_back(std::thread([it](){draw_Car(*it);}));
     }
 
     for(auto it = carThreads.begin(); it != carThreads.end(); ++it)
