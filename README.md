@@ -2,13 +2,6 @@
 
 #### Application written to practice some of classic thread based problems
 
-Install necessary packages (Ubuntu 19.10)
-
-```bash
-sudo apt-get install libncurses5-dev libncursesw5-dev
-sudo apt install cmake
-```
-
 Build docker image and run it
 ```bash
 docker build -t trafficlights:latest .
