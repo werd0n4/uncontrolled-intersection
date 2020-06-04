@@ -28,6 +28,7 @@ WINDOW* init_map()
                         x_max_size/2-road_state->wall/2);
 
     start_color();
+
     //Color means car destination
     init_pair(1, COLOR_GREEN, COLOR_BLACK);// TOP
     init_pair(2, COLOR_RED, COLOR_BLACK);// Right
