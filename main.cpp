@@ -28,9 +28,11 @@ WINDOW* init_map()
                         x_max_size/2-road_state->wall/2);
 
     start_color();
-    init_pair(1, COLOR_GREEN, COLOR_BLACK);// Forward
+    //Color means car destination
+    init_pair(1, COLOR_GREEN, COLOR_BLACK);// TOP
     init_pair(2, COLOR_RED, COLOR_BLACK);// Right
-    init_pair(3, COLOR_CYAN, COLOR_BLACK);// Left
+    init_pair(3, COLOR_CYAN, COLOR_BLACK);// BOT
+    init_pair(4, COLOR_YELLOW, COLOR_BLACK);// LEFT
 
     return win;
 }
@@ -44,6 +46,7 @@ void read_input()
             case 27://ESC - exit program
                 endwin();
                 std::cout << "Uncontrolled intersection simulator v1.0" << std::endl;
+                std::cout << std::endl;
                 std::cout << "Filip Gajewski i Tymoteusz Frankiewicz 2020" << std::endl;
                 std::cout << std::endl;
                 std::cout << "Drive save and focus on the road :D" << std::endl;
@@ -89,9 +92,9 @@ void refreshScreen(std::vector<Car>& cars)
             //rysowanie aut
             position = (*it).getPosition();
             if(!(*it).getHasArrived()){
-                wattron(win,COLOR_PAIR((*it).dir+1));
+                wattron(win,COLOR_PAIR((*it).destination+1));
                 mvwprintw(win, position.first, position.second, (*it).getSymbol());
-                wattroff(win,COLOR_PAIR((*it).dir+1));
+                wattroff(win,COLOR_PAIR((*it).destination+1));
             }
             wrefresh(win);
         }
@@ -130,7 +133,7 @@ int main(int argc, char* argv[])
 {
     srand (time(NULL));
     int carNumber = atoi(argv[1]);
-    carNumber = carNumber%26;
+    carNumber = carNumber%27;
     if(carNumber == 0)
         carNumber = 1;
     char c[26][2] = {"A", "B", "C", "D", "E",
