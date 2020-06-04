@@ -4,8 +4,6 @@
 #include "RoadState.cpp"
 
 
-
-
 class Car 
 {
     private:
@@ -21,6 +19,7 @@ class Car
         RoadState* road_state;
         std::pair<int,int> position, newPosition;//(y,x)
         Road_Pos start_pos;
+        Road_Pos destination;
         Movement_direction dir;
 
     Car(WINDOW* _win, RoadState* _road_state, Road_Pos _start_pos, Movement_direction _dir, const char* _symbol) : win(_win), road_state(_road_state), 
@@ -46,6 +45,7 @@ class Car
                 break;
         }
         newPosition = position;
+        calculateDestination();
     }
 
     ~Car(){
@@ -213,6 +213,73 @@ class Car
                     || road_state->getPositionStatus(position.second-2, position.first-2);
                     // || road_state->getPositionStatus(position.second-2, position.first);
             }
+        }
+    }
+
+    void calculateDestination(){
+        switch (start_pos)
+        {
+        case TOP:
+            switch (dir)
+            {
+            case FORWARD:
+                destination = BOT;
+                break;
+            case TURN_RIGHT:
+                destination = LEFT;
+                break;
+            case TURN_LEFT:
+                destination = RIGHT;
+                break;
+            
+            }
+            break;
+        case RIGHT:
+            switch (dir)
+            {
+            case FORWARD:
+                destination = LEFT;
+                break;
+            case TURN_RIGHT:
+                destination = TOP;
+                break;
+            case TURN_LEFT:
+                destination = BOT;
+                break;
+            
+            }
+            break;
+        case BOT:
+            switch (dir)
+            {
+            case FORWARD:
+                destination = TOP;
+                break;
+            case TURN_RIGHT:
+                destination = RIGHT;
+                break;
+            case TURN_LEFT:
+                destination = LEFT;
+                break;
+            
+            }
+            break;
+        case LEFT:
+            switch (dir)
+            {
+            case FORWARD:
+                destination = RIGHT;
+                break;
+            case TURN_RIGHT:
+                destination = BOT;
+                break;
+            case TURN_LEFT:
+                destination = TOP;
+                break;
+            
+            }
+            break;
+        
         }
     }
 
