@@ -9,15 +9,6 @@ sudo apt-get install libncurses5-dev libncursesw5-dev
 sudo apt install cmake
 ```
 
-Create build folder and compile program
-
-```bash
-mkdir build
-cd build
-cmake ../
-make
-```
-
 Build docker image and run it
 ```bash
 docker build -t trafficlights:latest .
@@ -26,5 +17,13 @@ docker run -it trafficlights
 
 Inside container we run program as in regular terminal
 ```bash
-./out.o parameters
+./out.o parameter
 ```
+
+As a parameter the user gives the number of cars that are to cross the intersection.
+Each car has a color which indicates its destination:
+
+Green - TOP
+Red - RIGHT
+Light blue - BOT
+Orange - LEFT
