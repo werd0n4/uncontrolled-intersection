@@ -5,7 +5,7 @@
 ##### Important note
 While writing project, we abandoned idea of creating crossroad with traffic lights.
 Traffic lights would not cause critical section on crossroad. Thus, we implemented 
-crossroad equivalent crossroad. There are two rules (as in real life): right hand rule
+equivalent crossroad. There are two rules (as in real life): right hand rule
 and left turn rule.
 
 ##### Limitations
