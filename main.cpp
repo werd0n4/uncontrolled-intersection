@@ -12,28 +12,44 @@ bool isPaused;
 WINDOW* win;
 RoadState road_state(2,10);
 
-WINDOW* init_map()
+void init_map()
 {
     int y_max_size, x_max_size;
 
     initscr();
-    getmaxyx(stdscr, y_max_size, x_max_size);
-    cbreak();
-    curs_set(0);
-    WINDOW* win = newwin(road_state.wall+2,
-                        road_state.wall+2,
-                        y_max_size/2-road_state.wall/2,
-                        x_max_size/2-road_state.wall/2);
 
     start_color();
-
     //Color means car destination
     init_pair(1, COLOR_GREEN, COLOR_BLACK);// TOP
     init_pair(2, COLOR_RED, COLOR_BLACK);// Right
     init_pair(3, COLOR_CYAN, COLOR_BLACK);// BOT
     init_pair(4, COLOR_YELLOW, COLOR_BLACK);// LEFT
+    
+    getmaxyx(stdscr, y_max_size, x_max_size);
+    curs_set(0);
 
-    return win;
+    win = newwin(road_state.wall+2, road_state.wall+2, y_max_size/2-road_state.wall/2, x_max_size/2-road_state.wall/2);
+
+    WINDOW* legend = newwin(10, 100, 0, 0);
+    mvwprintw(legend, 1, 1, "Each car has a color which indicates its\n destination (from OBSERVATOR'S PERSPECTIVE):");
+    
+    wattron(legend, COLOR_PAIR(1));
+    mvwprintw(legend, 4, 1, "- Green - TOP");
+    wattroff(legend, COLOR_PAIR(1));
+
+    wattron(legend, COLOR_PAIR(2));
+    mvwprintw(legend, 5, 1, "- Red - RIGHT");
+    wattroff(legend, COLOR_PAIR(2));
+
+    wattron(legend, COLOR_PAIR(3));
+    mvwprintw(legend, 6, 1, "- Light blue - BOT");
+    wattroff(legend, COLOR_PAIR(3));
+
+    wattron(legend, COLOR_PAIR(4));
+    mvwprintw(legend, 7, 1, "- Orange - LEFT");
+    wattron(legend, COLOR_PAIR(4));
+    wrefresh(legend);
+
 }
 
 void read_input()
@@ -61,7 +77,7 @@ void read_input()
 
 void draw_map()
 {
-    clear();
+    // werase(win);
     box(win,0,0);
 
     //horizontal
@@ -104,6 +120,7 @@ void refresh_screen(std::vector<Car>& cars)
 
 int main(int argc, char* argv[])
 {
+
     isPaused = false;
     running = true;
     srand (time(NULL));
@@ -121,7 +138,7 @@ int main(int argc, char* argv[])
     std::vector<Car> cars;
     std::vector<std::thread> carThreads;
 
-    win = init_map();
+    init_map();
 
     for(int i = 0; i < carNumber; ++i){
         cars.push_back(Car(win, road_state, Road_Pos(rand()%4), Movement_direction(rand()%3), c[i]));
