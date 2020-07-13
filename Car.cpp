@@ -3,6 +3,8 @@
 #include <thread>
 #include "RoadState.cpp"
 
+extern bool isPaused;
+extern bool running;
 
 class Car 
 {
@@ -16,32 +18,32 @@ class Car
         bool hasArrived;
         int speed;
     public:
-        RoadState* road_state;
+        RoadState& road_state;
         std::pair<int,int> position, newPosition;//(y,x)
         Road_Pos start_pos;
         Road_Pos destination;
         Movement_direction dir;
 
-    Car(WINDOW* _win, RoadState* _road_state, Road_Pos _start_pos, Movement_direction _dir, const char* _symbol) : win(_win), road_state(_road_state), 
+    Car(WINDOW* _win, RoadState& _road_state, Road_Pos _start_pos, Movement_direction _dir, const char* _symbol) : win(_win), road_state(_road_state), 
                                                                                     dir(_dir), symbol(_symbol), start_pos(_start_pos),
                                                                                     hasArrived(false), speed(500)
     {
-        switch(this->start_pos){
+        switch(start_pos){
             case 0://top
                 position.first = 1;
-                position.second = road_state->slots+1;
+                position.second = road_state.slots+1;
                 break;
             case 2://bot
-                position.first = 2*road_state->slots + road_state->lanes;
-                position.second = road_state->slots+road_state->lanes;
+                position.first = 2*road_state.slots + road_state.lanes;
+                position.second = road_state.slots+road_state.lanes;
                 break;
             case 3://left
-                position.first = road_state->slots + road_state->lanes;
+                position.first = road_state.slots + road_state.lanes;
                 position.second = 1;
                 break;
             case 1://right
-                position.first = road_state->slots+1;
-                position.second = 2*road_state->slots + road_state->lanes;
+                position.first = road_state.slots+1;
+                position.second = 2*road_state.slots + road_state.lanes;
                 break;
         }
         newPosition = position;
@@ -49,26 +51,27 @@ class Car
     }
 
     ~Car(){
-        road_state->setPositionFree(position.second, position.first);
+        road_state.setPositionFree(position.second, position.first);
     }
 
+
     void set_on_junction(){
-        road_state->setPositionOccupied(position.second, position.first);
+        road_state.setPositionOccupied(position.second, position.first);
     }
 
     void calculate_movement_to_do(){
         switch(dir){
             case FORWARD:
-                delta_y_to_do = 2*road_state->slots + road_state->lanes-1;
+                delta_y_to_do = 2*road_state.slots + road_state.lanes-1;
                 delta_x_to_do = 0;
                 break;
             case TURN_RIGHT:
-                delta_y_to_do = road_state->slots;
-                delta_x_to_do = road_state->slots;
+                delta_y_to_do = road_state.slots;
+                delta_x_to_do = road_state.slots;
                 break;
             case TURN_LEFT:
-                delta_y_to_do = road_state->slots + road_state->lanes-1;
-                delta_x_to_do = road_state->slots + road_state->lanes-1;
+                delta_y_to_do = road_state.slots + road_state.lanes-1;
+                delta_x_to_do = road_state.slots + road_state.lanes-1;
                 break;
         }
     }
@@ -141,7 +144,7 @@ class Car
             ++current_delta_x;
         }
         else{
-            this->hasArrived = true;
+            hasArrived = true;
         }
     }
 
@@ -151,16 +154,16 @@ class Car
 
         calculate_next_position();
         if(hasArrived){
-            road_state->setPositionFree(position.second, position.first);
+            road_state.setPositionFree(position.second, position.first);
             return;
         }
         while(!moveFinished){
-            if((road_state->getPositionStatus(newPosition.second, newPosition.first) == false && checkIfYouCanPassCrossing(position, newPosition)) || 
-                (road_state->checkIfCrossingIsBlocked() && start_pos == BOT)){//check if position is already occupied or crossing is blocked
+            if((road_state.getPositionStatus(newPosition.second, newPosition.first) == false && checkIfYouCanPassCrossing(position, newPosition)) || 
+                (road_state.checkIfCrossingIsBlocked() && start_pos == BOT)){//check if position is already occupied or crossing is blocked
 
                 //position is free
-                road_state->setPositionOccupied(newPosition.second, newPosition.first);
-                road_state->setPositionFree(position.second, position.first);
+                road_state.setPositionOccupied(newPosition.second, newPosition.first);
+                road_state.setPositionFree(position.second, position.first);
                 position = newPosition;
                 moveFinished = true;
             }
@@ -172,7 +175,7 @@ class Car
 
     //return true if there is a car on your path on crossing
     bool checkIfYouCanPassCrossing(std::pair<int, int> position, std::pair<int, int> newPosition){
-        if(position == road_state->getStopLine(start_pos)){
+        if(position == road_state.getStopLine(start_pos)){
             return !checkRightSide(position, newPosition);
         }
         else{
@@ -184,34 +187,34 @@ class Car
     bool checkRightSide(std::pair<int, int> position, std::pair<int, int> newPosition){
         if(position.first - newPosition.first != 0){//car is entering in vertical line
             if(position.first - newPosition.first > 0){//car is entering from bot to top
-                return road_state->getPositionStatus(position.second+1, position.first-2)//default case to check
-                    || road_state->getPositionStatus(position.second+1, position.first-1)
-                    || road_state->getPositionStatus(position.second+1, position.first)
-                    || road_state->getPositionStatus(position.second+2, position.first-2);
-                    // || road_state->getPositionStatus(position.second, position.first-2);
+                return road_state.getPositionStatus(position.second+1, position.first-2)//default case to check
+                    || road_state.getPositionStatus(position.second+1, position.first-1)
+                    || road_state.getPositionStatus(position.second+1, position.first)
+                    || road_state.getPositionStatus(position.second+2, position.first-2);
+                    // || road_state.getPositionStatus(position.second, position.first-2);
             }
             else{//car is moving from top to bot
-                return road_state->getPositionStatus(position.second-1, position.first+2)//default case to check
-                    || road_state->getPositionStatus(position.second-1, position.first+1)
-                    || road_state->getPositionStatus(position.second-1, position.first)
-                    || road_state->getPositionStatus(position.second-2, position.first+2);
-                    // || road_state->getPositionStatus(position.second, position.first+2);
+                return road_state.getPositionStatus(position.second-1, position.first+2)//default case to check
+                    || road_state.getPositionStatus(position.second-1, position.first+1)
+                    || road_state.getPositionStatus(position.second-1, position.first)
+                    || road_state.getPositionStatus(position.second-2, position.first+2);
+                    // || road_state.getPositionStatus(position.second, position.first+2);
             }
         }
         else{//car is entering in horizontal line 
             if(position.second - newPosition.second < 0){//car is entering from left to right
-                return road_state->getPositionStatus(position.second+2, position.first+1)//default case to check
-                    || road_state->getPositionStatus(position.second+1, position.first+1)
-                    || road_state->getPositionStatus(position.second, position.first+1)
-                    || road_state->getPositionStatus(position.second+2, position.first+2);
-                    // || road_state->getPositionStatus(position.second+2, position.first);
+                return road_state.getPositionStatus(position.second+2, position.first+1)//default case to check
+                    || road_state.getPositionStatus(position.second+1, position.first+1)
+                    || road_state.getPositionStatus(position.second, position.first+1)
+                    || road_state.getPositionStatus(position.second+2, position.first+2);
+                    // || road_state.getPositionStatus(position.second+2, position.first);
             }
             else{//car is entering from right to left
-                return road_state->getPositionStatus(position.second-2, position.first-1)//default case to check
-                    || road_state->getPositionStatus(position.second-1, position.first-1)
-                    || road_state->getPositionStatus(position.second, position.first-1)
-                    || road_state->getPositionStatus(position.second-2, position.first-2);
-                    // || road_state->getPositionStatus(position.second-2, position.first);
+                return road_state.getPositionStatus(position.second-2, position.first-1)//default case to check
+                    || road_state.getPositionStatus(position.second-1, position.first-1)
+                    || road_state.getPositionStatus(position.second, position.first-1)
+                    || road_state.getPositionStatus(position.second-2, position.first-2);
+                    // || road_state.getPositionStatus(position.second-2, position.first);
             }
         }
     }
@@ -284,20 +287,20 @@ class Car
     }
 
     bool getHasArrived(){
-        return this->hasArrived;
+        return hasArrived;
     }
 
     int getSpeed(){
-        return this->speed;
+        return speed;
     }
 
     bool isStartPositionOccupied(){
-        return road_state->getPositionStatus(position.second, position.first);
+        return road_state.getPositionStatus(position.second, position.first);
     }
 
     void slowDown(){
-        if(this->speed < 1000)
-            this->speed += 100;
+        if(speed < 1000)
+            speed += 100;
     }
 
     const char* getSymbol(){
@@ -306,5 +309,30 @@ class Car
 
     std::pair<int, int> getPosition(){
         return position;
+    }
+
+    void ride()
+    {
+        calculate_movement_to_do();
+        bool car_is_set = false;
+
+        while(!car_is_set){//Setting vehicle on the road
+            bool is_start_pos_occupied = isStartPositionOccupied();
+            if(!is_start_pos_occupied){
+                set_on_junction();
+                car_is_set = true;
+            }
+            else{
+                std::this_thread::sleep_for(std::chrono::milliseconds(getSpeed()));
+            }
+        } 
+        //car is driving
+        while(!getHasArrived())
+        {
+            while(!isPaused){
+                std::this_thread::sleep_for(std::chrono::milliseconds(getSpeed()));
+                move();
+            }
+        }
     }
 };

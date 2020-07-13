@@ -8,11 +8,11 @@
 #include "Car.cpp"
 
 std::mutex mtx;
-bool running = true;
-bool isPaused = false;
+bool running;
+bool isPaused;
 WINDOW* win;
 WINDOW* outside;
-RoadState* road_state;
+RoadState road_state(2,10);
 
 WINDOW* init_map()
 {
@@ -22,10 +22,10 @@ WINDOW* init_map()
     getmaxyx(stdscr, y_max_size, x_max_size);
     cbreak();
     curs_set(0);
-    WINDOW* win = newwin(road_state->wall+2,
-                        road_state->wall+2,
-                        y_max_size/2-road_state->wall/2,
-                        x_max_size/2-road_state->wall/2);
+    WINDOW* win = newwin(road_state.wall+2,
+                        road_state.wall+2,
+                        y_max_size/2-road_state.wall/2,
+                        x_max_size/2-road_state.wall/2);
 
     start_color();
 
@@ -67,22 +67,22 @@ void draw_map()
     box(win,0,0);
 
     //horizontal
-    for(int i=0;i<road_state->lanes;++i){
-        for(int j=1;j<road_state->wall+1;++j){
-            mvwprintw(win, road_state->slots+i+1,j , ".");
+    for(int i=0;i<road_state.lanes;++i){
+        for(int j=1;j<road_state.wall+1;++j){
+            mvwprintw(win, road_state.slots+i+1,j , ".");
         }
     }
 
     //vertical
-    for(int i = 0; i < road_state->lanes;++i){
-        for(int j=1;j < road_state->wall+1;++j){
-           mvwprintw(win, j, road_state->slots+i+1, ".");
+    for(int i = 0; i < road_state.lanes;++i){
+        for(int j=1;j < road_state.wall+1;++j){
+           mvwprintw(win, j, road_state.slots+i+1, ".");
         }
     }
     wrefresh(win);
 }
 
-void refreshScreen(std::vector<Car>& cars)
+void refresh_screen(std::vector<Car>& cars)
 {
     std::pair<int, int> position;
     while(running)
@@ -104,33 +104,10 @@ void refreshScreen(std::vector<Car>& cars)
     }
 }
 
-void draw_Car(Car& car)
-{
-    car.calculate_movement_to_do();
-    bool carIsSet = false;
-
-    while(!carIsSet){//Setting vehicle on the road
-        bool isStartPositionOccupied = car.isStartPositionOccupied();
-        if(!isStartPositionOccupied){
-            car.set_on_junction();
-            carIsSet = true;
-        }
-        else{
-            std::this_thread::sleep_for(std::chrono::milliseconds(car.getSpeed()));
-        }
-    } 
-    //car is driving
-    while (!car.getHasArrived())
-    {
-        while(!isPaused){
-            std::this_thread::sleep_for(std::chrono::milliseconds(car.getSpeed()));
-            car.move();
-        }
-    }
-}
-
 int main(int argc, char* argv[])
 {
+    isPaused = false;
+    running = true;
     srand (time(NULL));
     int carNumber = atoi(argv[1]);
     carNumber = carNumber%27;
@@ -145,7 +122,6 @@ int main(int argc, char* argv[])
 
     std::vector<Car> cars;
     std::vector<std::thread> carThreads;
-    road_state = new RoadState(2,10);
 
     win = init_map();
 
@@ -154,11 +130,11 @@ int main(int argc, char* argv[])
     }
 
     std::thread input([]{read_input();});
-    std::thread screenRefresh([&cars]{refreshScreen(cars);});
+    std::thread screenRefresh([&cars]{refresh_screen(cars);});
 
     for(auto& car : cars)
     {
-        carThreads.push_back(std::thread([&car](){draw_Car(car);}));
+        carThreads.push_back(std::thread([&car]{car.ride();}));
     }
 
     for(auto& thread : carThreads)
@@ -167,7 +143,6 @@ int main(int argc, char* argv[])
     }
     screenRefresh.join();
     input.join();
-
 
     return 0;
 }
