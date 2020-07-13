@@ -79,7 +79,6 @@ void read_input()
 
 void draw_map()
 {
-    // werase(win);
     box(win,0,0);
 
     //horizontal

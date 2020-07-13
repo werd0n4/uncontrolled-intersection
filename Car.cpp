@@ -290,19 +290,6 @@ class Car
         return hasArrived;
     }
 
-    int getSpeed(){
-        return speed;
-    }
-
-    bool isStartPositionOccupied(){
-        return road_state.getPositionStatus(position.second, position.first);
-    }
-
-    void slowDown(){
-        if(speed < 1000)
-            speed += 100;
-    }
-
     const char* getSymbol(){
         return symbol;
     }
@@ -317,20 +304,20 @@ class Car
         bool car_is_set = false;
 
         while(!car_is_set){//Setting vehicle on the road
-            bool is_start_pos_occupied = isStartPositionOccupied();
-            if(!is_start_pos_occupied){
+            // bool is_start_pos_occupied = isStartPositionOccupied();
+            if(!road_state.getPositionStatus(position.second, position.first)){
                 set_on_junction();
                 car_is_set = true;
             }
             else{
-                std::this_thread::sleep_for(std::chrono::milliseconds(getSpeed()));
+                std::this_thread::sleep_for(std::chrono::milliseconds(speed));
             }
         } 
         //car is driving
-        while(!getHasArrived())
+        while(!hasArrived)
         {
             while(!isPaused){
-                std::this_thread::sleep_for(std::chrono::milliseconds(getSpeed()));
+                std::this_thread::sleep_for(std::chrono::milliseconds(speed));
                 move();
             }
         }
