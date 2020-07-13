@@ -7,11 +7,9 @@
 
 #include "Car.cpp"
 
-std::mutex mtx;
 bool running;
 bool isPaused;
 WINDOW* win;
-WINDOW* outside;
 RoadState road_state(2,10);
 
 WINDOW* init_map()
