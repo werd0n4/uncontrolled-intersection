@@ -88,14 +88,14 @@ void refreshScreen(std::vector<Car>& cars)
     while(running)
     {
         draw_map();
-        for(auto it = cars.begin(); it != cars.end(); ++it)
+        for(auto& car : cars)
         {
             //rysowanie aut
-            position = (*it).getPosition();
-            if(!(*it).getHasArrived()){
-                wattron(win,COLOR_PAIR((*it).destination+1));
-                mvwprintw(win, position.first, position.second, (*it).getSymbol());
-                wattroff(win,COLOR_PAIR((*it).destination+1));
+            position = car.getPosition();
+            if(!car.getHasArrived()){
+                wattron(win,COLOR_PAIR(car.destination+1));
+                mvwprintw(win, position.first, position.second, car.getSymbol());
+                wattroff(win,COLOR_PAIR(car.destination+1));
             }
             wrefresh(win);
         }
@@ -127,7 +127,6 @@ void draw_Car(Car& car)
             car.move();
         }
     }
-    // car.~Car();
 }
 
 int main(int argc, char* argv[])
@@ -154,17 +153,17 @@ int main(int argc, char* argv[])
         cars.push_back(Car(win, road_state, Road_Pos(rand()%4), Movement_direction(rand()%3), c[i]));
     }
 
-    std::thread input([](){read_input();});
-    std::thread screenRefresh([&cars](){refreshScreen(cars);});
+    std::thread input([]{read_input();});
+    std::thread screenRefresh([&cars]{refreshScreen(cars);});
 
-    for(auto it = cars.begin(); it != cars.end(); ++it)
+    for(auto& car : cars)
     {
-        carThreads.push_back(std::thread([it](){draw_Car(*it);}));
+        carThreads.push_back(std::thread([&car](){draw_Car(car);}));
     }
 
-    for(auto it = carThreads.begin(); it != carThreads.end(); ++it)
+    for(auto& thread : carThreads)
     {
-        (*it).join();
+        thread.join();
     }
     screenRefresh.join();
     input.join();
