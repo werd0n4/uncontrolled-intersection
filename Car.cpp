@@ -4,7 +4,6 @@
 #include "RoadState.cpp"
 
 extern bool isPaused;
-extern bool running;
 
 class Car 
 {
